@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sagebrush Energy — Lead to Cash</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sun: #F5A623;
+    --ember: #E8581A;
+    --desert: #1A1208;
+    --sage: #4A6741;
+    --sage-light: #7A9E72;
+    --sand: #F2EAD8;
+    --sand-mid: #E8D9BF;
+    --ink: #1C1810;
+    --muted: #8A7D68;
+    --white: #FDFAF4;
+    --alert: #C0392B;
+    --success: #2E7D32;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--desert);
+    color: var(--sand);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: linear-gradient(135deg, #0D0A04 0%, #1A1208 60%, #2A1F0A 100%);
+    border-bottom: 1px solid rgba(245,166,35,0.2);
+    padding: 24px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .logo {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.6rem;
+    color: var(--sun);
+    letter-spacing: 0.02em;
+  }
+  .logo span { color: var(--sand); font-style: italic; }
+  .badge {
+    background: var(--ember);
+    color: white;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    padding: 4px 10px;
+    border-radius: 2px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.6} }
+
+  /* ── LIVE LEAD BANNER ── */
+  .live-lead {
+    background: linear-gradient(90deg, rgba(232,88,26,0.15), rgba(245,166,35,0.08));
+    border: 1px solid rgba(232,88,26,0.4);
+    border-left: 4px solid var(--ember);
+    margin: 32px 40px 0;
+    border-radius: 4px;
+    padding: 24px 28px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  .live-lead h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.1rem;
+    color: var(--sun);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .dot { width: 8px; height: 8px; background: var(--ember); border-radius: 50%; animation: pulse 1.2s infinite; display: inline-block; }
+  .voicemail {
+    background: rgba(0,0,0,0.3);
+    border-radius: 4px;
+    padding: 14px 16px;
+    font-size: 0.82rem;
+    line-height: 1.7;
+    color: var(--sand-mid);
+    font-style: italic;
+    border-left: 3px solid var(--muted);
+  }
+  .action-box h3 {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--sun);
+    margin-bottom: 12px;
+    font-family: 'DM Mono', monospace;
+  }
+  .action-list { list-style: none; }
+  .action-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
+  .action-list li:last-child { border-bottom: none; }
+  .step-num {
+    background: var(--ember);
+    color: white;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    width: 20px; height: 20px;
+    border-radius: 2px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .phone {
+    font-family: 'DM Mono', monospace;
+    color: var(--sun);
+    font-size: 1rem;
+    letter-spacing: 0.05em;
+  }
+
+  /* ── PIPELINE STATUS ── */
+  .pipeline-bar {
+    margin: 24px 40px 0;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 4px;
+    padding: 16px 20px;
+  }
+  .pipeline-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+  .pipeline-projects {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .proj-chip {
+    padding: 6px 12px;
+    border-radius: 3px;
+    font-size: 0.75rem;
+    font-family: 'DM Mono', monospace;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .proj-chip.complete { background: rgba(46,125,50,0.2); border: 1px solid rgba(46,125,50,0.5); color: #81C784; }
+  .proj-chip.active   { background: rgba(245,166,35,0.12); border: 1px solid rgba(245,166,35,0.4); color: var(--sun); }
+  .proj-chip.survey   { background: rgba(74,103,65,0.2); border: 1px solid rgba(122,158,114,0.4); color: var(--sage-light); }
+  .proj-chip.dispute  { background: rgba(192,57,43,0.15); border: 1px solid rgba(192,57,43,0.4); color: #EF9A9A; }
+  .proj-chip.new      { background: rgba(232,88,26,0.15); border: 1px solid var(--ember); color: var(--sun); animation: pulse 1.5s infinite; }
+
+  /* ── PROCESS STAGES ── */
+  .stages-header {
+    margin: 36px 40px 16px;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+  }
+  .stages-header h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.4rem;
+    color: var(--sand);
+  }
+  .stages-header p {
+    font-size: 0.78rem;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+  }
+
+  .stages { margin: 0 40px 40px; display: flex; flex-direction: column; gap: 4px; }
+
+  .stage {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 4px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .stage:hover { border-color: rgba(245,166,35,0.3); }
+  .stage.active-stage { border-color: rgba(232,88,26,0.5); background: rgba(232,88,26,0.05); }
+
+  .stage-header {
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .stage-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    width: 28px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .stage-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    border: 2px solid var(--muted);
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+  .stage.active-stage .stage-dot { border-color: var(--ember); background: var(--ember); }
+
+  .stage-title {
+    font-size: 0.9rem;
+    font-weight: 500;
+    flex: 1;
+    color: var(--sand);
+  }
+  .stage-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    padding: 3px 8px;
+    border-radius: 2px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .tag-hubspot { background: rgba(245,166,35,0.12); color: var(--sun); border: 1px solid rgba(245,166,35,0.25); }
+  .tag-gdrive  { background: rgba(74,103,65,0.2); color: var(--sage-light); border: 1px solid rgba(122,158,114,0.3); }
+  .tag-both    { background: rgba(232,88,26,0.1); color: #FFAB76; border: 1px solid rgba(232,88,26,0.3); }
+  .tag-field   { background: rgba(255,255,255,0.07); color: var(--sand-mid); border: 1px solid rgba(255,255,255,0.15); }
+
+  .chevron {
+    color: var(--muted);
+    font-size: 0.75rem;
+    transition: transform 0.2s;
+  }
+  .stage.open .chevron { transform: rotate(180deg); }
+
+  .stage-body {
+    display: none;
+    padding: 0 20px 20px 64px;
+  }
+  .stage.open .stage-body { display: block; }
+
+  .stage-body p {
+    font-size: 0.82rem;
+    color: var(--muted);
+    line-height: 1.7;
+    margin-bottom: 14px;
+  }
+
+  .checklist { list-style: none; }
+  .checklist li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 6px 0;
+    font-size: 0.82rem;
+    color: var(--sand-mid);
+    line-height: 1.5;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .checklist li:last-child { border: none; }
+  .check-icon {
+    color: var(--sage-light);
+    font-size: 0.75rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .hubspot-note {
+    margin-top: 12px;
+    background: rgba(245,166,35,0.06);
+    border-left: 3px solid rgba(245,166,35,0.4);
+    padding: 10px 14px;
+    border-radius: 0 3px 3px 0;
+    font-size: 0.78rem;
+    color: var(--sand-mid);
+    line-height: 1.6;
+  }
+  .hubspot-note strong { color: var(--sun); font-weight: 500; }
+
+  .folder-note {
+    margin-top: 12px;
+    background: rgba(74,103,65,0.1);
+    border-left: 3px solid var(--sage);
+    padding: 10px 14px;
+    border-radius: 0 3px 3px 0;
+    font-size: 0.78rem;
+    color: var(--sand-mid);
+    line-height: 1.6;
+  }
+  .folder-note strong { color: var(--sage-light); font-weight: 500; }
+
+  code {
+    font-family: 'DM Mono', monospace;
+    background: rgba(0,0,0,0.4);
+    padding: 2px 6px;
+    border-radius: 2px;
+    font-size: 0.78em;
+    color: var(--sun);
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid rgba(255,255,255,0.06);
+    padding: 20px 40px;
+    font-size: 0.72rem;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  @media (max-width: 700px) {
+    header, .live-lead, .pipeline-bar, .stages-header, .stages, footer { margin-left: 16px; margin-right: 16px; }
+    .live-lead { grid-template-columns: 1fr; }
+    .stage-body { padding-left: 44px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Sagebrush <span>Energy</span></div>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <span style="font-size:0.75rem;color:var(--muted);font-family:'DM Mono',monospace;">Solar Ops Clean Pipeline</span>
+    <div class="badge">🔴 Live Lead</div>
+  </div>
+</header>
+
+<!-- LIVE LEAD BANNER -->
+<div class="live-lead">
+  <div>
+    <h2><span class="dot"></span> Inbound Lead — Action Required Now</h2>
+    <div style="margin-bottom:10px;">
+      <span style="font-size:0.72rem;color:var(--muted);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:0.1em;">Leslie Davis · Voicemail Transcript</span>
+    </div>
+    <div class="voicemail">
+      "Hi, this is Leslie Davis and I'm interested in getting a solar system set up in my house. I was wondering if someone could give me a call back. I've sent emails to you guys because I did the request for an estimate or a quote on your website and then I sent an email afterwards because I didn't hear back from you. So now I'm calling you. Could you please give me a call back. My landline home number is 775-327-4663. Thank you so much. Bye bye."
+    </div>
+    <div style="margin-top:14px;display:flex;gap:12px;align-items:center;">
+      <span class="phone">775-327-4663</span>
+      <span style="font-size:0.75rem;color:var(--ember);">⚠ Third outreach — respond within 2 hours</span>
+    </div>
+  </div>
+  <div class="action-box">
+    <h3>Your Next 5 Actions — Right Now</h3>
+    <ul class="action-list">
+      <li><span class="step-num">1</span> Call <strong>775-327-4663</strong> — she's already tried web form + email. Acknowledge the delay, apologize briefly, be warm.</li>
+      <li><span class="step-num">2</span> Create HubSpot contact: <strong>Leslie Davis</strong> · Stage: <em>Lead Capture</em> · Source: <em>Inbound Website</em></li>
+      <li><span class="step-num">3</span> Log all 3 touchpoints (web form, email, voicemail) as Activities in HubSpot</li>
+      <li><span class="step-num">4</span> Run Pre-Qual script (Stage 2 below) — ask address, ownership, monthly bill, timeline</li>
+      <li><span class="step-num">5</span> Book site survey OR send Calendly/date options before you hang up</li>
+    </ul>
+    <div style="margin-top:14px;padding:10px 12px;background:rgba(0,0,0,0.3);border-radius:3px;font-size:0.78rem;color:var(--sand-mid);">
+      <strong style="color:var(--sun);">Opening line:</strong><br>
+      "Hi Leslie, this is Bill with Sagebrush Energy — I'm so sorry for the delay in getting back to you, I really appreciate you reaching out a third time. You're absolutely on my radar now. Got a few minutes to talk about your solar project?"
+    </div>
+  </div>
+</div>
+
+<!-- PIPELINE STATUS -->
+<div class="pipeline-bar">
+  <div class="pipeline-label">Current Pipeline — Solar Ops Clean</div>
+  <div class="pipeline-projects">
+    <div class="proj-chip complete">✓ Jin Christensen — $50K final payment pending</div>
+    <div class="proj-chip active">⚡ Honebein — Permit active · Deposit requested</div>
+    <div class="proj-chip survey">◎ Aneiros / VC Highlands — Site survey pending</div>
+    <div class="proj-chip dispute">⚖ Sciascia — Payment dispute · NSCB ruling ✓ our favor</div>
+    <div class="proj-chip new">★ Leslie Davis — NEW LEAD · Stage 1</div>
+  </div>
+</div>
+
+<!-- STAGE HEADERS -->
+<div class="stages-header">
+  <h2>Lead-to-Cash Process</h2>
+  <p>Click any stage to expand · Tap ★ = Leslie Davis current stage</p>
+</div>
+
+<div class="stages" id="stages">
+
+  <!-- STAGE 1 -->
+  <div class="stage active-stage open" id="s1">
+    <div class="stage-header" onclick="toggle('s1')">
+      <span class="stage-num">01</span>
+      <span class="stage-dot"></span>
+      <span class="stage-title">★ Lead Capture</span>
+      <span class="stage-tag tag-hubspot">HubSpot</span>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="stage-body">
+      <p>Every inbound inquiry (web, phone, referral, canvass) gets a HubSpot contact within 15 minutes. Speed-to-lead is the single biggest driver of close rate in residential solar.</p>
+      <ul class="checklist">
+        <li><span class="check-icon">◆</span> Create Contact in HubSpot — First/Last, Phone, Email, Source</li>
+        <li><span class="check-icon">◆</span> Set Deal Stage: <em>Lead Capture</em> in Solar Ops Clean pipeline</li>
+        <li><span class="check-icon">◆</span> Log every prior touchpoint as Activities (web form, emails, calls)</li>
+        <li><span class="check-icon">◆</span> Set a follow-up Task: call within 2 hrs of inbound, or same day for after-hours</li>
+        <li><span class="check-icon">◆</span> Tag lead source (Website, Referral, Canvass, Repeat) for pipeline reporting</li>
+      </ul>
+      <div class="hubspot-note">
+        <strong>HubSpot fields to populate:</strong> Contact Owner · Lead Source · Phone (landline vs cell) · First Contact Date · Notes (verbatim from voicemail/form)
+      </div>
+    </div>
+  </div>
+
+  <!-- STAGE 2 -->
+  <div class="stage" id="s2">
+    <div class="stage-header" onclick="toggle('s2')">
+      <span class="stage-num">02</span>
+      <span class="stage-dot"></span>
+      <span class="stage-title">Pre-Qualification Call</span>
+      <span class="stage-tag tag-hubspot">HubSpot</span>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="stage-body">
+      <p>15–20 minute call. Goal: confirm fit, gather design inputs, set next step. Don't sell — qualify. A bad lead that makes it to proposal costs you 4+ hours.</p>
+      <ul class="checklist">
+        <li><span class="check-icon">◆</span> Property address + confirm homeowner (not renter)</li>
+        <li><span class="check-icon">◆</span> Average monthly NV Energy bill (target: $150+/mo for strong ROI)</li>
+        <li><span class="check-icon">◆</span> Roof age and type (shingle, tile, metal) — HOA restrictions?</li>
+        <li><span class="check-icon">◆</span> Interest in storage (Powerwall)? EV charger add-on?</li>
+        <li><span class="check-icon">◆</span> Decision-maker status — spouse/partner need to be on call?</li>
+        <li><span class="check-icon">◆</span> Timeline: "Are you looking to move forward in the next 30/60/90 days?"</li>
+        <li><span class="check-icon">◆</span> Schedule site survey before hanging up — offer 2 specific times</li>
+      </ul>
+      <div class="hubspot-note">
+        <strong>Update Deal:</strong> Stage → <em>Pre-Qualification</em> · Add: Address, Monthly Bill, Roof Type, Storage Interest, Survey Date scheduled · Log full call notes
+      </div>
+    </div>
+  </div>
+
+  <!-- STAGE 3 -->
+  <div class="stage" id="s3">
+    <div class="stage-header" onclick="toggle('s3')">
+      <span class="stage-num">03</span>
+      <span class="stage-dot"></span>
+      <span class="stage-title">Site Survey</span>
+      <span class="stage-tag tag-both">HubSpot + Drive</span>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="stage-body">
+      <p>On-site visit to capture roof dimensions, shading, main panel specs, and utility meter. This data feeds directly into the Enphase/Aurora system design.</p>
+      <ul class="checklist">
+        <li><span class="check-icon">◆</span> Create Google Drive project folder: <code>WASHOE-[YR]-Davis-[Address]</code></li>
+        <li><span class="check-icon">◆</span> Paste Drive folder URL into HubSpot Deal → <em>Project Folder URL</em> field</li>
+        <li><span class="check-icon">◆</span> Capture: roof pitch, azimuth, sq ft per plane, shading obstacles</li>
+        <li><span class="check-icon">◆</span> Main panel: brand, amperage (200A upgrade needed?), meter location</li>
+        <li><span class="check-icon">◆</span> Photos: all roof planes, panel, meter, attic access, structural concerns</li>
+        <li><span class="check-icon">◆</span> Upload photos to Drive folder → <em>01-SiteSurvey</em> subfolder</li>
+        <li><span class="check-icon">◆</span> Note any structural, HOA, or AHJ flags</li>
+      </ul>
+      <div class="folder-note">
+        <strong>Drive folder structure:</strong> 01-SiteSurvey / 02-Design / 03-Permit / 04-Install / 05-Commissioning / 06-Closeout
+      </div>
+    </div>
+  </div>
+
+  <!-- STAGE 4 -->
+  <div class="stage" id="s4">
+    <div class="stage-header" onclick="toggle('s4')">
+      <span class="stage-num">04</span>
+      <span class="stage-dot"></span>
+      <span class="stage-title">Proposal</span>
+      <span class="stage-tag tag-both">HubSpot + Drive</span>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="stage-body">
+      <p>Deliver a written proposal within 48 hours of site survey. Include system design, production estimates, pricing (cash/loan/PPA), and ITC details. Walk it in person or via video call — never email-only.</p>
+      <ul class="checklist">
+        <li><span class="check-icon">◆</span> Complete Enphase Installer Platform / Aurora system design</li>
+        <li><span class="check-icon">◆</span> Calculate kWh offset (target 90–100% of annual usage)</li>
+        <li><span class="check-icon">◆</span> 3 options: cash, Mosaic/GoodLeap loan, and (if applicable) Powerwall bundle</li>
+        <li><span class="check-icon">◆</span> Include 30% federal ITC + any NV state incentives</li>
+        <li><span class="check-icon">◆</span> NEM 3.0 / NV Energy net metering rate schedule — include payback timeline</li>
+        <li><span class="check-icon">◆</span> Save proposal PDF to Drive → <em>02-Design</em></li>
+        <li><span class="check-icon">◆</span> Log proposal amount in HubSpot Deal Value field</li>
+        <li><span class="check-icon">◆</span> Set follow-up Task: 48hr check-in call after proposal delivery</li>
+      </ul>
+      <div class="hubspot-note">
+        <strong>HubSpot:</strong> Stage → <em>Proposal Delivered</em> · Deal Amount = proposed system price · Proposal Date · Follow-up Task created
+      </div>
+    </div>
+  </div>
+
+  <!-- STAGE 5 -->
+  <div class="stage" id="s5">
+    <div class="stage-header" onclick="toggle('s5')">
+      <span class="stage-num">05</span>
+      <span class="stage-dot"></span>
+      <span class="stage-title">Contract + Deposit</span>
+      <span class="stage-tag tag-both">HubSpot + Drive</span>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="stage-body">
+      <p>Nevada C-2 contractor requirements apply. Use a written contract with scope, payment schedule, permit disclosure, and 3-day right of rescission notice per NRS 598.974.</p>
+      <ul class="checklist">
+        <li><span class="check-icon">◆</span> DocuSign or wet-signed contract with full scope of work</li>
+        <li><span class="check-icon">◆</span> Payment schedule: typically 10% deposit · 40% permit approval · 40% install · 10% commissioning</li>
+        <li><span class="check-icon">◆</span> Include NV 3-day right of rescission notice (mandatory)</li>
+        <li><span class="check-icon">◆</span> Collect deposit check or ACH — issue receipt immediately</li>
+        <li><span class="check-icon">◆</span> Save signed contract to Drive → <em>06-Closeout/Contracts</em></li>
+        <li><span class="check-icon">◆</span> Log deposit received in HubSpot · Stage → <em>Contract Signed</em></li>
+        <li><span class="check-icon">◆</span> Begin permit package preparation</li>
+      </ul>
+      <div class="hubspot-note">
+        <strong>Note:</strong> Per Sciascia situation — ensure payment schedule milestones are crystal clear in writing before any work begins.
+      </div>
+    </div>
+  </div>
+
+  <!-- STAGE 6 -->
+  <div class="stage" id="s6">
+    <div class="stage-header" onclick="toggle('s6')">
+      <span class="stage-num">06</span>
+      <span class="stage-dot"></span>
+      <span class="stage-title">Pre-Installation</span>
+      <span class="stage-tag tag-both">HubSpot + Drive</span>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="stage-body">
+      <p>Permit, utility interconnection application, material procurement. This stage takes 2–6 weeks in Washoe County. Keep the customer informed weekly — silence kills trust.</p>
+      <ul class="checklist">
+        <li><span class="check-icon">◆</span> Submit permit to Washoe County Building / City of Reno — upload to Drive <em>03-Permit</em></li>
+        <li><span class="check-icon">◆</span> Submit NV Energy interconnection application (PTO required pre-energize)</li>
+        <li><span class="check-icon">◆</span> Order equipment: Enphase microinverters, modules, Powerwall (if applicable)</li>
+        <li><span class="check-icon">◆</span> Schedule install crew and crane/lift if needed</li>
+        <li><span class="check-icon">◆</span> Weekly customer update — email or text with permit status</li>
+        <li><span class="check-icon">◆</span> Log permit approval date in HubSpot · Collect milestone payment</li>
+      </ul>
+      <div class="hubspot-note">
+        <strong>HubSpot:</strong> Stage → <em>Pre-Installation</em> · Log permit # · AHJ name · Expected install date
+      </div>
+    </div>
+  </div>
+
+  <!-- STAGE 7 -->
+  <div class="stage" id="s7">
+    <div class="stage-header" onclick="toggle('s7')">
+      <span class="stage-num">07</span>
+      <span class="stage-dot"></span>
+      <span class="stage-title">Installation</span>
+      <span class="stage-tag tag-field">Field + Drive</span>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="stage-body">
+      <p>1–2 day install. C-2 license work — document everything. Inspect at completion before crew leaves site.</p>
+      <ul class="checklist">
+        <li><span class="check-icon">◆</span> Pre-install customer call day before: confirm access, pets, Wi-Fi password for Enphase gateway</li>
+        <li><span class="check-icon">◆</span> Installation photos: each row of panels, all wire runs, combiner box, inverters</li>
+        <li><span class="check-icon">◆</span> Enphase gateway commissioned on-site — confirm all modules reporting</li>
+        <li><span class="check-icon">◆</span> Panel upgrade documented if applicable (before/after photos)</li>
+        <li><span class="check-icon">◆</span> Upload all install photos to Drive → <em>04-Install</em></li>
+        <li><span class="check-icon">◆</span> Request AHJ inspection appointment</li>
+        <li><span class="check-icon">◆</span> Log install complete date in HubSpot · Collect milestone payment</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- STAGE 8 -->
+  <div class="stage" id="s8">
+    <div class="stage-header" onclick="toggle('s8')">
+      <span class="stage-num">08</span>
+      <span class="stage-dot"></span>
+      <span class="stage-title">Commissioning</span>
+      <span class="stage-tag tag-both">HubSpot + Drive</span>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="stage-body">
+      <p>AHJ inspection → NV Energy PTO → system live. This is the emotional peak for the homeowner — make it a moment.</p>
+      <ul class="checklist">
+        <li><span class="check-icon">◆</span> Pass AHJ inspection — upload inspection card to Drive → <em>05-Commissioning</em></li>
+        <li><span class="check-icon">◆</span> Submit PTO request to NV Energy with final inspection sign-off</li>
+        <li><span class="check-icon">◆</span> Receive PTO letter — system can be energized</li>
+        <li><span class="check-icon">◆</span> On-site commissioning visit: walk customer through Enphase app, explain production monitoring</li>
+        <li><span class="check-icon">◆</span> Review system performance expectations and net metering billing cycle</li>
+        <li><span class="check-icon">◆</span> Present customer with commissioning packet: warranty docs, permit card, PTO letter</li>
+        <li><span class="check-icon">◆</span> Upload commissioning packet to Drive → <em>05-Commissioning</em></li>
+        <li><span class="check-icon">◆</span> Invoice final payment · Stage → <em>Commissioning Complete</em></li>
+      </ul>
+      <div class="hubspot-note">
+        <strong>Jin Christensen:</strong> At this stage — $50K final payment pending. Send invoice + follow up within 24 hrs if outstanding.
+      </div>
+    </div>
+  </div>
+
+  <!-- STAGE 9 -->
+  <div class="stage" id="s9">
+    <div class="stage-header" onclick="toggle('s9')">
+      <span class="stage-num">09</span>
+      <span class="stage-dot"></span>
+      <span class="stage-title">Final Payment</span>
+      <span class="stage-tag tag-hubspot">HubSpot</span>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="stage-body">
+      <p>Collect final payment at or immediately after commissioning. Do not leave the site without confirming payment timeline if not collected in person.</p>
+      <ul class="checklist">
+        <li><span class="check-icon">◆</span> Issue final invoice at commissioning visit — hand-deliver or send DocuSign</li>
+        <li><span class="check-icon">◆</span> Payment due: Net 5 from PTO date (specify in contract)</li>
+        <li><span class="check-icon">◆</span> Log payment received in HubSpot · Mark Deal as <em>Closed Won</em></li>
+        <li><span class="check-icon">◆</span> File lien waiver upon receipt of final payment</li>
+        <li><span class="check-icon">◆</span> Provide customer with copy of all warranty documentation</li>
+      </ul>
+      <div class="hubspot-note">
+        <strong>Dispute prevention:</strong> Contract language should specify "Final payment due upon system commissioning and PTO receipt" — not upon customer satisfaction review.
+      </div>
+    </div>
+  </div>
+
+  <!-- STAGE 10 -->
+  <div class="stage" id="s10">
+    <div class="stage-header" onclick="toggle('s10')">
+      <span class="stage-num">10</span>
+      <span class="stage-dot"></span>
+      <span class="stage-title">Follow-Up + Referral</span>
+      <span class="stage-tag tag-hubspot">HubSpot</span>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="stage-body">
+      <p>The best lead is a referral. A happy solar customer talks to 5–7 neighbors in the first month. Build the ask into your process.</p>
+      <ul class="checklist">
+        <li><span class="check-icon">◆</span> 30-day check-in call: "How's the system performing? Any questions on the app?"</li>
+        <li><span class="check-icon">◆</span> Request Google review — send direct link via text</li>
+        <li><span class="check-icon">◆</span> Ask directly: "Do you have any neighbors or friends who've mentioned solar? I'd love a warm intro."</li>
+        <li><span class="check-icon">◆</span> Log referral contacts in HubSpot — create new Deals with source = Referral + original customer name</li>
+        <li><span class="check-icon">◆</span> First-year anniversary email: system production report + referral reminder</li>
+        <li><span class="check-icon">◆</span> Tag customer as <em>Referral Source</em> in HubSpot if they send leads</li>
+      </ul>
+      <div class="hubspot-note">
+        <strong>Referral incentive:</strong> Consider a $250–500 bill credit or gift card per installed referral — document in a simple referral program one-pager.
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <span>Sagebrush Energy LLC · Reno, NV · C-2 Licensed · Tesla Powerwall + Enphase</span>
+  <span>Solar Ops Clean Pipeline · HubSpot + Google Drive</span>
+</footer>
+
+<script>
+  function toggle(id) {
+    const el = document.getElementById(id);
+    el.classList.toggle('open');
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Site Survey · Sagebrush Energy</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F7F4EE;
+    --surface: #FFFFFF;
+    --border: #DDD8CE;
+    --ink: #1A1510;
+    --muted: #8A8178;
+    --sun: #E8581A;
+    --sun-light: #FDF0E8;
+    --sun-dark: #C94D15;
+    --sage: #4A6741;
+    --sage-light: #EFF4EE;
+    --caution: #C8860A;
+    --caution-light: #FEF8EC;
+    --success: #2E7D32;
+    --success-light: #EFF7EF;
+    --danger: #C0392B;
+    --danger-light: #FDECEA;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body { background: var(--bg); font-family: 'IBM Plex Sans', sans-serif; color: var(--ink); min-height: 100vh; padding-bottom: 130px; }
+
+  /* ── HEADER ── */
+  .app-header { background: var(--ink); padding: 14px 20px; position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; }
+  .app-header h1 { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; color: #F5A623; letter-spacing: 0.05em; font-weight: 500; }
+  .app-header span { font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; color: rgba(255,255,255,0.4); }
+
+  /* ── PROGRESS ── */
+  .progress-bar { background: var(--border); height: 3px; position: sticky; top: 49px; z-index: 99; }
+  .progress-fill { background: var(--sun); height: 100%; width: 0%; transition: width 0.3s ease; }
+
+  /* ── CONFIG BANNER ── */
+  .config-banner { margin: 14px 16px 0; background: var(--caution-light); border: 1px solid rgba(200,134,10,0.3); border-left: 4px solid var(--caution); border-radius: 6px; padding: 12px 16px; }
+  .config-banner.connected { background: var(--success-light); border-color: rgba(46,125,50,0.3); border-left-color: var(--success); }
+  .config-banner h3 { font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--caution); margin-bottom: 8px; }
+  .config-banner.connected h3 { color: var(--success); }
+  .api-row { display: flex; gap: 8px; align-items: center; }
+  .api-row input { flex: 1; background: white; border: 1.5px solid rgba(200,134,10,0.3); border-radius: 6px; padding: 8px 12px; font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem; color: var(--ink); outline: none; }
+  .btn-connect { background: var(--caution); color: white; border: none; border-radius: 6px; padding: 8px 14px; font-family: 'IBM Plex Sans', sans-serif; font-size: 0.78rem; font-weight: 600; cursor: pointer; white-space: nowrap; }
+  .btn-connect.ok { background: var(--success); }
+  .config-note { font-size: 0.72rem; color: var(--caution); margin-top: 6px; line-height: 1.5; }
+  .config-note.ok { color: var(--success); }
+
+  /* ── DEAL FINDER ── */
+  .deal-finder { margin: 14px 16px 0; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .deal-finder-header { padding: 13px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+  .deal-finder-header .section-num { font-family: 'IBM Plex Mono', monospace; font-size: 0.62rem; font-weight: 600; color: white; background: var(--sage); width: 22px; height: 22px; border-radius: 4px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .deal-finder-header h3 { font-weight: 600; font-size: 0.88rem; flex: 1; }
+  .deal-finder-body { padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; }
+  .search-row { display: flex; gap: 8px; }
+  .search-row input { flex: 1; background: var(--bg); border: 1.5px solid var(--border); border-radius: 6px; padding: 10px 12px; font-family: 'IBM Plex Sans', sans-serif; font-size: 0.9rem; color: var(--ink); outline: none; }
+  .search-row input:focus { border-color: var(--sun); background: white; }
+  .btn-search { background: var(--ink); color: white; border: none; border-radius: 6px; padding: 10px 16px; font-family: 'IBM Plex Sans', sans-serif; font-size: 0.85rem; font-weight: 600; cursor: pointer; white-space: nowrap; }
+  .btn-search:active { opacity: 0.8; }
+
+  .deal-result { display: none; padding: 12px 14px; border-radius: 6px; font-size: 0.82rem; line-height: 1.6; }
+  .deal-result.found { display: block; background: var(--success-light); border: 1px solid rgba(46,125,50,0.3); color: var(--success); }
+  .deal-result.not-found { display: block; background: var(--danger-light); border: 1px solid rgba(192,57,43,0.2); color: var(--danger); }
+  .deal-result.searching { display: block; background: var(--bg); border: 1px solid var(--border); color: var(--muted); font-style: italic; }
+  .deal-result strong { display: block; font-size: 0.88rem; margin-bottom: 2px; }
+  .deal-result .deal-meta { font-size: 0.72rem; opacity: 0.8; }
+  .drive-row { display: flex; flex-direction: column; gap: 6px; }
+  .drive-row label { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.09em; color: var(--sage); }
+  .drive-row input { background: var(--bg); border: 1.5px solid rgba(74,103,65,0.3); border-radius: 6px; padding: 9px 12px; font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem; color: var(--ink); outline: none; width: 100%; }
+  .drive-row input:focus { border-color: var(--sage); background: white; }
+  .drive-note { font-size: 0.72rem; color: var(--sage); line-height: 1.5; }
+
+  /* ── SECTIONS ── */
+  .section { margin: 14px 16px 0; background: var(--surface); border-radius: 8px; border: 1px solid var(--border); overflow: hidden; }
+  .section-header { padding: 13px 16px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--border); }
+  .section-num { font-family: 'IBM Plex Mono', monospace; font-size: 0.62rem; font-weight: 600; color: white; background: var(--sun); width: 22px; height: 22px; border-radius: 4px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .section-title { font-weight: 600; font-size: 0.88rem; color: var(--ink); flex: 1; }
+
+  /* ── FIELDS ── */
+  .field { padding: 11px 16px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 6px; }
+  .field:last-child { border-bottom: none; }
+  .field label { font-size: 0.68rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.09em; font-family: 'IBM Plex Mono', monospace; }
+  .field label .req { color: var(--sun); margin-left: 2px; }
+
+  input[type="text"], input[type="number"], input[type="tel"], select, textarea {
+    width: 100%; background: var(--bg); border: 1.5px solid var(--border); border-radius: 6px;
+    padding: 10px 12px; font-family: 'IBM Plex Sans', sans-serif; font-size: 0.95rem; color: var(--ink);
+    outline: none; transition: border-color 0.15s; -webkit-appearance: none; appearance: none;
+  }
+  input:focus, select:focus, textarea:focus { border-color: var(--sun); background: white; }
+  textarea { resize: none; min-height: 68px; line-height: 1.5; }
+  select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238A8178' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 12px center; padding-right: 36px;
+  }
+
+  /* ── PILLS ── */
+  .pill-group { display: flex; flex-wrap: wrap; gap: 7px; }
+  .pill-group input { display: none; }
+  .pill-group label { display: inline-flex; align-items: center; padding: 7px 13px; border-radius: 20px; border: 1.5px solid var(--border); font-size: 0.82rem; color: var(--ink); cursor: pointer; transition: all 0.12s; font-family: 'IBM Plex Sans', sans-serif; background: var(--bg); }
+  .pill-group input:checked + label { background: var(--sun); border-color: var(--sun); color: white; font-weight: 500; }
+  .pill-group.sage input:checked + label { background: var(--sage); border-color: var(--sage); }
+
+  /* ── TOGGLES ── */
+  .toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid var(--border); }
+  .toggle-row:last-child { border-bottom: none; }
+  .toggle-label { font-size: 0.88rem; color: var(--ink); flex: 1; }
+  .toggle-sub { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
+  .toggle { position: relative; width: 44px; height: 26px; flex-shrink: 0; margin-left: 12px; }
+  .toggle input { opacity: 0; width: 0; height: 0; }
+  .toggle-track { position: absolute; inset: 0; background: var(--border); border-radius: 13px; cursor: pointer; transition: background 0.2s; }
+  .toggle-track:before { content: ''; position: absolute; width: 20px; height: 20px; left: 3px; top: 3px; background: white; border-radius: 50%; transition: transform 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+  .toggle input:checked + .toggle-track { background: var(--sun); }
+  .toggle input:checked + .toggle-track:before { transform: translateX(18px); }
+
+  /* ── FLAG ITEMS ── */
+  .flag-list { padding: 4px 0; }
+  .flag-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--border); cursor: pointer; }
+  .flag-item:last-child { border-bottom: none; }
+  .flag-item input[type="checkbox"] { width: 20px; height: 20px; border: 2px solid var(--border); border-radius: 4px; appearance: none; -webkit-appearance: none; flex-shrink: 0; cursor: pointer; transition: all 0.15s; background: var(--bg); position: relative; }
+  .flag-item input[type="checkbox"]:checked { background: var(--sun); border-color: var(--sun); }
+  .flag-item input[type="checkbox"]:checked::after { content: '✓'; position: absolute; color: white; font-size: 0.75rem; font-weight: 700; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+  .flag-text { font-size: 0.88rem; color: var(--ink); line-height: 1.4; }
+  .flag-sub { font-size: 0.72rem; color: var(--muted); margin-top: 1px; }
+
+  /* ── PHOTO CHECK ── */
+  .photo-check-item { display: flex; align-items: center; gap: 12px; padding: 11px 16px; border-bottom: 1px solid var(--border); cursor: pointer; }
+  .photo-check-item:last-child { border-bottom: none; }
+  .photo-check-item input[type="checkbox"] { width: 20px; height: 20px; border: 2px solid var(--border); border-radius: 4px; appearance: none; -webkit-appearance: none; flex-shrink: 0; cursor: pointer; transition: all 0.15s; background: var(--bg); position: relative; }
+  .photo-check-item input[type="checkbox"]:checked { background: var(--sage); border-color: var(--sage); }
+  .photo-check-item input[type="checkbox"]:checked::after { content: '✓'; position: absolute; color: white; font-size: 0.75rem; font-weight: 700; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+  .photo-label { font-size: 0.85rem; color: var(--ink); }
+  .photo-counter { font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; color: var(--muted); padding: 10px 16px; background: var(--bg); border-top: 1px solid var(--border); }
+
+  /* ── FLAG WARNING ── */
+  .flag-warn { display: none; margin: 0 16px 12px; background: var(--danger-light); border: 1px solid rgba(192,57,43,0.25); border-left: 4px solid var(--danger); border-radius: 6px; padding: 10px 14px; font-size: 0.8rem; color: var(--danger); line-height: 1.5; }
+  .flag-warn.show { display: block; }
+
+  /* ── BOTTOM BAR ── */
+  .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid var(--border); padding: 12px 16px; display: flex; gap: 10px; z-index: 100; box-shadow: 0 -4px 20px rgba(0,0,0,0.08); }
+  .btn-secondary { flex: 1; padding: 13px; background: var(--bg); border: 1.5px solid var(--border); border-radius: 8px; font-family: 'IBM Plex Sans', sans-serif; font-size: 0.85rem; font-weight: 500; color: var(--muted); cursor: pointer; }
+  .btn-primary { flex: 2.5; padding: 13px; background: var(--sun); border: none; border-radius: 8px; font-family: 'IBM Plex Sans', sans-serif; font-size: 0.9rem; font-weight: 600; color: white; cursor: pointer; }
+  .btn-primary:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; }
+  .btn-primary:active:not(:disabled) { background: var(--sun-dark); }
+
+  /* ── MODAL ── */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.65); z-index: 200; padding: 20px; overflow-y: auto; align-items: flex-start; justify-content: center; padding-top: 30px; }
+  .modal-overlay.show { display: flex; }
+  .modal { background: white; border-radius: 12px; width: 100%; max-width: 480px; overflow: hidden; }
+  .modal-header { background: var(--ink); padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; }
+  .modal-header h2 { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; color: #F5A623; font-weight: 500; }
+  .modal-close { color: white; font-size: 1.1rem; cursor: pointer; background: none; border: none; line-height: 1; }
+  .modal-body { padding: 14px 20px; max-height: 55vh; overflow-y: auto; }
+  .summary-section-title { font-family: 'IBM Plex Mono', monospace; font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); padding: 10px 0 4px; border-bottom: 1px solid var(--border); margin-bottom: 2px; }
+  .summary-row { display: flex; gap: 10px; padding: 7px 0; border-bottom: 1px solid rgba(0,0,0,0.04); }
+  .summary-key { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; color: var(--muted); min-width: 120px; padding-top: 1px; text-transform: uppercase; }
+  .summary-val { font-size: 0.82rem; color: var(--ink); font-weight: 500; flex: 1; word-break: break-word; }
+  .modal-footer { padding: 12px 20px; background: var(--bg); border-top: 1px solid var(--border); display: flex; gap: 10px; }
+  .submit-status { padding: 14px 16px; font-size: 0.84rem; line-height: 1.7; display: none; }
+  .submit-status.show { display: block; }
+  .submit-status.success { background: var(--success-light); color: var(--success); }
+  .submit-status.error { background: var(--danger-light); color: var(--danger); }
+
+  code { font-family: 'IBM Plex Mono', monospace; background: rgba(0,0,0,0.07); padding: 2px 5px; border-radius: 3px; font-size: 0.8em; }
+
+  .spacer { height: 14px; }
+
+  /* ── CREATE FALLBACK ── */
+  .create-fallback { display: none; background: var(--caution-light); border: 1px solid rgba(200,134,10,0.3); border-radius: 6px; padding: 14px 16px; }
+  .create-fallback.show { display: block; }
+  .create-fallback h4 { font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--caution); margin-bottom: 10px; }
+  .create-fallback .field-mini { display: flex; flex-direction: column; gap: 5px; margin-bottom: 10px; }
+  .create-fallback .field-mini label { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+  .create-fallback .field-mini input { background: white; border: 1.5px solid var(--border); border-radius: 6px; padding: 9px 12px; font-family: 'IBM Plex Sans', sans-serif; font-size: 0.9rem; color: var(--ink); outline: none; width: 100%; }
+  .create-fallback .field-mini input:focus { border-color: var(--caution); }
+  .create-fallback .field-row { display: flex; gap: 8px; }
+  .create-fallback .field-row .field-mini { flex: 1; }
+  .btn-create { width: 100%; background: var(--caution); color: white; border: none; border-radius: 6px; padding: 11px; font-family: 'IBM Plex Sans', sans-serif; font-size: 0.88rem; font-weight: 600; cursor: pointer; margin-top: 4px; }
+  .btn-create:active { opacity: 0.85; }
+  .btn-create:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; }
+  .create-status { display: none; margin-top: 10px; padding: 10px 12px; border-radius: 6px; font-size: 0.8rem; line-height: 1.6; }
+  .create-status.show { display: block; }
+  .create-status.success { background: var(--success-light); color: var(--success); border: 1px solid rgba(46,125,50,0.3); }
+  .create-status.error { background: var(--danger-light); color: var(--danger); border: 1px solid rgba(192,57,43,0.2); }
+</style>
+</head>
+<body>
+
+<div class="app-header">
+  <h1>SAGEBRUSH · SITE SURVEY</h1>
+  <span id="date-display"></span>
+</div>
+<div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+<!-- API CONFIG -->
+<div class="config-banner" id="config-banner">
+  <h3>⚙ HubSpot API Key Required</h3>
+  <div class="api-row">
+    <input type="password" id="hs-api-key" placeholder="pat-na1-xxxxxxxx-xxxx-..." autocomplete="off">
+    <button class="btn-connect" onclick="saveApiKey()">Connect</button>
+  </div>
+  <div class="config-note" id="config-note">
+    Same Private App token as Pre-Qual form. Needs <code>contacts</code>, <code>crm.objects.deals</code>, and <code>crm.objects.notes</code> scopes.
+  </div>
+</div>
+
+<!-- DEAL FINDER -->
+<div class="deal-finder">
+  <div class="deal-finder-header">
+    <div class="section-num">★</div>
+    <h3>Find HubSpot Deal</h3>
+  </div>
+  <div class="deal-finder-body">
+    <div class="search-row">
+      <input type="text" id="search-input" placeholder="Last name or phone — e.g. Davis or 775-327" onkeydown="if(event.key==='Enter') searchDeal()">
+      <button class="btn-search" onclick="searchDeal()">Search</button>
+    </div>
+    <div class="deal-result" id="deal-result"></div>
+
+    <!-- FALLBACK: CREATE NEW CONTACT + DEAL -->
+    <div class="create-fallback" id="create-fallback">
+      <h4>⚡ No record found — create new Contact + Deal</h4>
+      <div class="field-row">
+        <div class="field-mini"><label>First Name *</label><input type="text" id="new-first" placeholder="Leslie"></div>
+        <div class="field-mini"><label>Last Name *</label><input type="text" id="new-last" placeholder="Davis"></div>
+      </div>
+      <div class="field-mini"><label>Phone *</label><input type="tel" id="new-phone" placeholder="775-327-4663"></div>
+      <div class="field-mini"><label>Email</label><input type="email" id="new-email" placeholder="leslie@email.com"></div>
+      <div class="field-mini"><label>Lead Source</label>
+        <select id="new-source">
+          <option value="Website Form">Website Form</option>
+          <option value="Referral">Referral</option>
+          <option value="Canvass">Canvass</option>
+          <option value="Direct / Walk-in">Direct / Walk-in</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <button class="btn-create" id="btn-create" onclick="createContactAndDeal()">Create Contact + Deal in HubSpot</button>
+      <div class="create-status" id="create-status"></div>
+    </div>
+
+    <div class="drive-row">
+      <label>📁 Google Drive Folder URL</label>
+      <input type="text" id="f-drive-url" placeholder="https://drive.google.com/drive/folders/...">
+      <div class="drive-note">Paste Drive folder URL here — it will be saved to the HubSpot deal. Folder name: <code>WASHOE-[YR]-[LastName]-[Address]</code></div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 1: PROPERTY -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">1</div>
+    <span class="section-title">Property & Ownership</span>
+  </div>
+  <div class="field"><label>Street Address <span class="req">*</span></label><input type="text" id="f-address" placeholder="123 Sun Valley Dr, Reno NV 89502" oninput="updateProgress()"></div>
+  <div class="field">
+    <label>Homeowner Confirmed <span class="req">*</span></label>
+    <div class="pill-group">
+      <input type="radio" name="owner" id="own-yes" value="Yes — Owner" onchange="updateProgress()"><label for="own-yes">✓ Owner</label>
+      <input type="radio" name="owner" id="own-trust" value="Trust / LLC" onchange="updateProgress()"><label for="own-trust">Trust / LLC</label>
+      <input type="radio" name="owner" id="own-no" value="Renter — STOP" onchange="updateProgress(); checkOwner()"><label for="own-no">✗ Renter</label>
+    </div>
+  </div>
+  <div class="flag-warn" id="warn-renter">⛔ Renter confirmed on site — cannot proceed with install. Contact office.</div>
+  <div class="field">
+    <label>HOA</label>
+    <div class="pill-group">
+      <input type="radio" name="hoa" id="hoa-no" value="No HOA"><label for="hoa-no">No HOA</label>
+      <input type="radio" name="hoa" id="hoa-pend" value="HOA — approval pending"><label for="hoa-pend">HOA — approval needed</label>
+      <input type="radio" name="hoa" id="hoa-ok" value="HOA — approved"><label for="hoa-ok">HOA — approved</label>
+    </div>
+  </div>
+  <div class="field">
+    <label>County / AHJ</label>
+    <div class="pill-group">
+      <input type="radio" name="ahj" id="ahj-washoe" value="Washoe County"><label for="ahj-washoe">Washoe County</label>
+      <input type="radio" name="ahj" id="ahj-reno" value="City of Reno"><label for="ahj-reno">City of Reno</label>
+      <input type="radio" name="ahj" id="ahj-sparks" value="Sparks"><label for="ahj-sparks">Sparks</label>
+      <input type="radio" name="ahj" id="ahj-other" value="Other"><label for="ahj-other">Other</label>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 2: ROOF -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">2</div>
+    <span class="section-title">Roof Assessment</span>
+  </div>
+  <div class="field">
+    <label>Roof Material <span class="req">*</span></label>
+    <div class="pill-group">
+      <input type="radio" name="roofmat" id="rm-comp" value="Comp Shingle" onchange="updateProgress()"><label for="rm-comp">Comp Shingle</label>
+      <input type="radio" name="roofmat" id="rm-tile" value="Tile" onchange="updateProgress()"><label for="rm-tile">Tile</label>
+      <input type="radio" name="roofmat" id="rm-metal" value="Metal" onchange="updateProgress()"><label for="rm-metal">Metal</label>
+      <input type="radio" name="roofmat" id="rm-flat" value="Flat / TPO" onchange="updateProgress()"><label for="rm-flat">Flat / TPO</label>
+      <input type="radio" name="roofmat" id="rm-other" value="Other" onchange="updateProgress()"><label for="rm-other">Other</label>
+    </div>
+  </div>
+  <div class="field">
+    <label>Roof Age</label>
+    <div class="pill-group">
+      <input type="radio" name="roofage" id="ra-0" value="0–5 yrs"><label for="ra-0">0–5 yrs</label>
+      <input type="radio" name="roofage" id="ra-5" value="5–10 yrs"><label for="ra-5">5–10 yrs</label>
+      <input type="radio" name="roofage" id="ra-10" value="10–15 yrs"><label for="ra-10">10–15 yrs</label>
+      <input type="radio" name="roofage" id="ra-15" value="15–20 yrs"><label for="ra-15">15–20 yrs</label>
+      <input type="radio" name="roofage" id="ra-20" value="20+ yrs ⚠" onchange="checkRoofAge()"><label for="ra-20">20+ yrs ⚠</label>
+    </div>
+  </div>
+  <div class="flag-warn" id="warn-roofage">⚠ Roof 20+ years — recommend replacement before install. Add to proposal discussion.</div>
+  <div class="field">
+    <label>Roof Condition</label>
+    <div class="pill-group">
+      <input type="radio" name="roofcond" id="rc-good" value="Good"><label for="rc-good">Good</label>
+      <input type="radio" name="roofcond" id="rc-fair" value="Fair"><label for="rc-fair">Fair</label>
+      <input type="radio" name="roofcond" id="rc-poor" value="Poor — replace first" onchange="checkRoofCond()"><label for="rc-poor">Poor ⚠</label>
+    </div>
+  </div>
+  <div class="flag-warn" id="warn-roofcond">⚠ Poor roof condition — do not quote install until re-roof is addressed.</div>
+  <div class="field">
+    <label>Primary Array Azimuth</label>
+    <div class="pill-group">
+      <input type="radio" name="azimuth" id="az-s" value="South"><label for="az-s">South ★</label>
+      <input type="radio" name="azimuth" id="az-sw" value="SW"><label for="az-sw">SW</label>
+      <input type="radio" name="azimuth" id="az-se" value="SE"><label for="az-se">SE</label>
+      <input type="radio" name="azimuth" id="az-w" value="West"><label for="az-w">West</label>
+      <input type="radio" name="azimuth" id="az-e" value="East"><label for="az-e">East</label>
+      <input type="radio" name="azimuth" id="az-n" value="North ⚠" onchange="checkAzimuth()"><label for="az-n">North ⚠</label>
+    </div>
+  </div>
+  <div class="flag-warn" id="warn-azimuth">⚠ North-facing — very low production. Discuss with customer before proceeding.</div>
+  <div class="field">
+    <label>Approx Usable Area (sq ft)</label>
+    <input type="number" id="f-roofarea" placeholder="e.g. 600" oninput="updateProgress()">
+  </div>
+  <div class="field">
+    <label>Shading</label>
+    <div class="pill-group">
+      <input type="radio" name="shade" id="sh-none" value="None"><label for="sh-none">None</label>
+      <input type="radio" name="shade" id="sh-min" value="Minimal"><label for="sh-min">Minimal</label>
+      <input type="radio" name="shade" id="sh-mod" value="Moderate"><label for="sh-mod">Moderate ⚠</label>
+      <input type="radio" name="shade" id="sh-heavy" value="Heavy"><label for="sh-heavy">Heavy ⚠</label>
+    </div>
+  </div>
+  <div class="field">
+    <label>Shading Source / Notes</label>
+    <textarea id="f-shadenotes" placeholder="Trees to SW, neighbor chimney, HVAC units..."></textarea>
+  </div>
+  <div class="field">
+    <label>Roof Pitch (approx)</label>
+    <div class="pill-group">
+      <input type="radio" name="pitch" id="pt-flat" value="Flat (0–2/12)"><label for="pt-flat">Flat</label>
+      <input type="radio" name="pitch" id="pt-low" value="Low (3–4/12)"><label for="pt-low">Low</label>
+      <input type="radio" name="pitch" id="pt-med" value="Medium (5–8/12)"><label for="pt-med">Medium</label>
+      <input type="radio" name="pitch" id="pt-steep" value="Steep (9+/12)"><label for="pt-steep">Steep ⚠</label>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 3: ELECTRICAL -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">3</div>
+    <span class="section-title">Electrical System</span>
+  </div>
+  <div class="field">
+    <label>Main Panel Amperage <span class="req">*</span></label>
+    <div class="pill-group">
+      <input type="radio" name="amps" id="amp-100" value="100A" onchange="updateProgress(); checkPanel()"><label for="amp-100">100A ⚠</label>
+      <input type="radio" name="amps" id="amp-150" value="150A" onchange="updateProgress()"><label for="amp-150">150A</label>
+      <input type="radio" name="amps" id="amp-200" value="200A" onchange="updateProgress()"><label for="amp-200">200A ✓</label>
+      <input type="radio" name="amps" id="amp-400" value="400A" onchange="updateProgress()"><label for="amp-400">400A</label>
+      <input type="radio" name="amps" id="amp-unk" value="Unknown" onchange="updateProgress()"><label for="amp-unk">Unknown</label>
+    </div>
+  </div>
+  <div class="flag-warn" id="warn-panel-amps">⚠ 100A panel — upgrade likely required. Add to proposal as line item.</div>
+  <div class="field">
+    <label>Panel Brand</label>
+    <div class="pill-group">
+      <input type="radio" name="panelbrand" id="pb-sq" value="Square D"><label for="pb-sq">Square D</label>
+      <input type="radio" name="panelbrand" id="pb-ch" value="CH/Eaton"><label for="pb-ch">CH / Eaton</label>
+      <input type="radio" name="panelbrand" id="pb-ge" value="GE"><label for="pb-ge">GE</label>
+      <input type="radio" name="panelbrand" id="pb-siem" value="Siemens"><label for="pb-siem">Siemens</label>
+      <input type="radio" name="panelbrand" id="pb-fpe" value="FPE — UNSAFE" onchange="checkPanelBrand()"><label for="pb-fpe">FPE ⛔</label>
+      <input type="radio" name="panelbrand" id="pb-zin" value="Zinsco — UNSAFE" onchange="checkPanelBrand()"><label for="pb-zin">Zinsco ⛔</label>
+      <input type="radio" name="panelbrand" id="pb-other" value="Other" onchange="checkPanelBrand()"><label for="pb-other">Other</label>
+    </div>
+  </div>
+  <div class="flag-warn" id="warn-panel-brand">⛔ FPE / Zinsco panel — replacement mandatory before install. Flag in proposal and notify office.</div>
+  <div class="field">
+    <label>Available Breaker Slots</label>
+    <input type="number" id="f-slots" placeholder="e.g. 4">
+  </div>
+  <div class="field">
+    <label>Panel Upgrade Needed?</label>
+    <div class="pill-group">
+      <input type="radio" name="panelupgrade" id="pu-no" value="No"><label for="pu-no">No</label>
+      <input type="radio" name="panelupgrade" id="pu-yes" value="Yes — quote separately"><label for="pu-yes">Yes — quote separately</label>
+      <input type="radio" name="panelupgrade" id="pu-tbd" value="TBD"><label for="pu-tbd">TBD</label>
+    </div>
+  </div>
+  <div class="field">
+    <label>Meter Location</label>
+    <div class="pill-group">
+      <input type="radio" name="meter" id="m-front" value="Front"><label for="m-front">Front</label>
+      <input type="radio" name="meter" id="m-side" value="Side"><label for="m-side">Side</label>
+      <input type="radio" name="meter" id="m-rear" value="Rear"><label for="m-rear">Rear</label>
+      <input type="radio" name="meter" id="m-garage" value="Garage"><label for="m-garage">Garage</label>
+    </div>
+  </div>
+  <div class="field">
+    <label>Attic Access</label>
+    <div class="pill-group">
+      <input type="radio" name="attic" id="at-good" value="Good"><label for="at-good">Good</label>
+      <input type="radio" name="attic" id="at-limited" value="Limited"><label for="at-limited">Limited</label>
+      <input type="radio" name="attic" id="at-none" value="No attic"><label for="at-none">No attic</label>
+    </div>
+  </div>
+  <div class="field">
+    <label>Wi-Fi for Enphase Gateway</label>
+    <div class="pill-group">
+      <input type="radio" name="wifi" id="wf-yes" value="Yes"><label for="wf-yes">Yes</label>
+      <input type="radio" name="wifi" id="wf-no" value="No — cellular needed"><label for="wf-no">No — cellular</label>
+      <input type="radio" name="wifi" id="wf-weak" value="Weak — check coverage"><label for="wf-weak">Weak</label>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 4: STORAGE & EV -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">4</div>
+    <span class="section-title">Storage & EV</span>
+  </div>
+  <label class="toggle-row">
+    <div><div class="toggle-label">Tesla Powerwall</div><div class="toggle-sub">Confirm load center / gateway space</div></div>
+    <div class="toggle"><input type="checkbox" id="t-powerwall"><div class="toggle-track"></div></div>
+  </label>
+  <label class="toggle-row">
+    <div><div class="toggle-label">Enphase IQ Battery</div><div class="toggle-sub">Check phase compatibility</div></div>
+    <div class="toggle"><input type="checkbox" id="t-enphase-batt"><div class="toggle-track"></div></div>
+  </label>
+  <label class="toggle-row">
+    <div><div class="toggle-label">EV Charger (Level 2 EVSE)</div><div class="toggle-sub">240V circuit — note location preference</div></div>
+    <div class="toggle"><input type="checkbox" id="t-ev"><div class="toggle-track"></div></div>
+  </label>
+  <label class="toggle-row">
+    <div><div class="toggle-label">Whole-Home Backup Required</div><div class="toggle-sub">Drives Powerwall qty + transfer switch</div></div>
+    <div class="toggle"><input type="checkbox" id="t-backup"><div class="toggle-track"></div></div>
+  </label>
+  <div class="field">
+    <label>Battery / Gateway Location</label>
+    <div class="pill-group">
+      <input type="radio" name="battloc" id="bl-garage" value="Garage"><label for="bl-garage">Garage</label>
+      <input type="radio" name="battloc" id="bl-ext" value="Exterior wall"><label for="bl-ext">Exterior wall</label>
+      <input type="radio" name="battloc" id="bl-util" value="Utility room"><label for="bl-util">Utility room</label>
+      <input type="radio" name="battloc" id="bl-tbd" value="TBD"><label for="bl-tbd">TBD</label>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 5: FLAGS -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">5</div>
+    <span class="section-title">Flags & Issues</span>
+  </div>
+  <div class="flag-list">
+    <label class="flag-item"><input type="checkbox" id="flag-struct"><div><div class="flag-text">Structural concern — rafter spacing, rot, sag</div><div class="flag-sub">May require engineer sign-off</div></div></label>
+    <label class="flag-item"><input type="checkbox" id="flag-roof-replace"><div><div class="flag-text">Roof replacement recommended before install</div></div></label>
+    <label class="flag-item"><input type="checkbox" id="flag-panel-upgrade"><div><div class="flag-text">Panel upgrade required</div><div class="flag-sub">Add to proposal as separate line item</div></div></label>
+    <label class="flag-item"><input type="checkbox" id="flag-hoa"><div><div class="flag-text">HOA approval pending — hold permit submission</div></div></label>
+    <label class="flag-item"><input type="checkbox" id="flag-trees"><div><div class="flag-text">Tree trimming needed — customer to arrange</div></div></label>
+    <label class="flag-item"><input type="checkbox" id="flag-asbestos"><div><div class="flag-text">Possible asbestos / hazmat — pre-1980 tile</div><div class="flag-sub">Do not proceed without abatement clearance</div></div></label>
+    <label class="flag-item"><input type="checkbox" id="flag-other"><div><div class="flag-text">Other flag — see notes</div></div></label>
+  </div>
+  <div class="field" style="border-top: 1px solid var(--border);">
+    <label>Notes & Observations</label>
+    <textarea id="f-notes" placeholder="Gate code, dogs, customer comments, structural observations, access issues..."></textarea>
+  </div>
+</div>
+
+<!-- SECTION 6: PHOTO CHECKLIST -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">6</div>
+    <span class="section-title">Photo Checklist</span>
+  </div>
+  <label class="photo-check-item"><input type="checkbox" class="photo-check" onchange="updatePhotoCount()"><span class="photo-label">All roof planes — wide shot</span></label>
+  <label class="photo-check-item"><input type="checkbox" class="photo-check" onchange="updatePhotoCount()"><span class="photo-label">Close-up: each plane + ridge line</span></label>
+  <label class="photo-check-item"><input type="checkbox" class="photo-check" onchange="updatePhotoCount()"><span class="photo-label">Main electrical panel — open, showing breakers</span></label>
+  <label class="photo-check-item"><input type="checkbox" class="photo-check" onchange="updatePhotoCount()"><span class="photo-label">Utility meter</span></label>
+  <label class="photo-check-item"><input type="checkbox" class="photo-check" onchange="updatePhotoCount()"><span class="photo-label">Attic access + rafter framing</span></label>
+  <label class="photo-check-item"><input type="checkbox" class="photo-check" onchange="updatePhotoCount()"><span class="photo-label">Proposed inverter / gateway location</span></label>
+  <label class="photo-check-item"><input type="checkbox" class="photo-check" onchange="updatePhotoCount()"><span class="photo-label">Shading obstructions — trees, chimneys, vents</span></label>
+  <label class="photo-check-item"><input type="checkbox" class="photo-check" onchange="updatePhotoCount()"><span class="photo-label">Front of home (for permit application)</span></label>
+  <div class="photo-counter" id="photo-counter">0 / 8 photos checked</div>
+  <div class="field" style="border-top: 1px solid var(--border);">
+    <label style="color: var(--sage);">📁 Upload photos to Drive → 01-SiteSurvey before leaving the property</label>
+  </div>
+</div>
+
+<div class="spacer"></div>
+
+<div class="bottom-bar">
+  <button class="btn-secondary" onclick="clearForm()">Clear</button>
+  <button class="btn-primary" onclick="showModal()">Review & Push to HubSpot ▶</button>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>REVIEW — PUSH TO HUBSPOT</h2>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="submit-status" id="submit-status"></div>
+    <div class="modal-footer">
+      <button class="btn-secondary" style="flex:1;" onclick="closeModal()">Back</button>
+      <button class="btn-primary" style="flex:2;" id="hs-submit-btn" onclick="submitToHubSpot()">Push to HubSpot</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── DATE ──
+document.getElementById('date-display').textContent = new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+
+// ── API KEY ──
+let apiKey = localStorage.getItem('sg_hs_key') || '';
+let foundDealId = null;
+let foundContactId = null;
+let foundDealName = '';
+
+if (apiKey) showConnected();
+
+function saveApiKey() {
+  const val = document.getElementById('hs-api-key').value.trim();
+  if (!val) return;
+  apiKey = val;
+  localStorage.setItem('sg_hs_key', val);
+  showConnected();
+}
+
+function showConnected() {
+  const banner = document.getElementById('config-banner');
+  const note = document.getElementById('config-note');
+  const inp = document.getElementById('hs-api-key');
+  const btn = banner.querySelector('.btn-connect');
+  banner.classList.add('connected');
+  banner.querySelector('h3').textContent = '✓ HubSpot Connected';
+  inp.value = '••••••••••••••••••••••••'; inp.disabled = true;
+  btn.textContent = 'Change'; btn.classList.add('ok');
+  btn.onclick = () => {
+    inp.disabled = false; inp.value = ''; inp.focus();
+    banner.classList.remove('connected');
+    banner.querySelector('h3').textContent = '⚙ HubSpot API Key Required';
+    btn.textContent = 'Connect'; btn.classList.remove('ok');
+    btn.onclick = saveApiKey;
+  };
+  note.textContent = '✓ Ready. Search for the deal above to link this survey.';
+  note.className = 'config-note ok';
+}
+
+// ── DEAL SEARCH ──
+async function searchDeal() {
+  const q = document.getElementById('search-input').value.trim();
+  if (!q) return;
+  const result = document.getElementById('deal-result');
+  const fallback = document.getElementById('create-fallback');
+  result.className = 'deal-result searching';
+  result.innerHTML = 'Searching HubSpot…';
+  fallback.classList.remove('show');
+  foundDealId = null; foundContactId = null; foundDealName = '';
+
+  if (!apiKey) {
+    result.className = 'deal-result not-found';
+    result.innerHTML = '⚠ Connect HubSpot API key first.';
+    return;
+  }
+
+  try {
+    const isPhone = /\d{3}/.test(q);
+    const filterGroups = isPhone
+      ? [{ filters: [{ propertyName: 'phone', operator: 'CONTAINS_TOKEN', value: q.replace(/\D/g,'') }] }]
+      : [
+          { filters: [{ propertyName: 'lastname', operator: 'CONTAINS_TOKEN', value: q }] },
+          { filters: [{ propertyName: 'firstname', operator: 'CONTAINS_TOKEN', value: q }] }
+        ];
+
+    const contactSearch = await fetch('https://api.hubapi.com/crm/v3/objects/contacts/search', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+      body: JSON.stringify({ filterGroups, properties: ['firstname','lastname','phone','email','address'], limit: 5 })
+    });
+    const contactData = await contactSearch.json();
+
+    if (!contactData.results || contactData.results.length === 0) {
+      result.className = 'deal-result not-found';
+      result.innerHTML = `❌ No contact found for "<strong>${q}</strong>".`;
+      // Pre-fill the fallback name fields if search was a name
+      if (!isPhone) {
+        const parts = q.trim().split(' ');
+        if (parts.length === 1) document.getElementById('new-last').value = parts[0];
+        if (parts.length >= 2) { document.getElementById('new-first').value = parts[0]; document.getElementById('new-last').value = parts.slice(1).join(' '); }
+      } else {
+        document.getElementById('new-phone').value = q;
+      }
+      fallback.classList.add('show');
+      return;
+    }
+
+    const contact = contactData.results[0];
+    foundContactId = contact.id;
+    const contactName = `${contact.properties.firstname || ''} ${contact.properties.lastname || ''}`.trim();
+
+    // Find associated deals
+    const dealsRes = await fetch(`https://api.hubapi.com/crm/v3/objects/contacts/${contact.id}/associations/deals`, {
+      headers: { 'Authorization': `Bearer ${apiKey}` }
+    });
+    const dealsData = await dealsRes.json();
+
+    if (!dealsData.results || dealsData.results.length === 0) {
+      result.className = 'deal-result not-found';
+      result.innerHTML = `⚠ Contact <strong>${contactName}</strong> found (ID: ${contact.id}) but has no deals.`;
+      // Show fallback pre-filled with existing contact info so user can create a deal
+      document.getElementById('new-first').value = contact.properties.firstname || '';
+      document.getElementById('new-last').value = contact.properties.lastname || '';
+      document.getElementById('new-phone').value = contact.properties.phone || '';
+      document.getElementById('new-email').value = contact.properties.email || '';
+      document.getElementById('btn-create').textContent = 'Create Deal for This Contact';
+      // Store contact id so create function skips contact creation
+      document.getElementById('btn-create').dataset.existingContactId = contact.id;
+      fallback.classList.add('show');
+      return;
+    }
+
+    // Get deal details
+    const dealId = dealsData.results[0].id;
+    const dealRes = await fetch(`https://api.hubapi.com/crm/v3/objects/deals/${dealId}?properties=dealname,dealstage,amount`, {
+      headers: { 'Authorization': `Bearer ${apiKey}` }
+    });
+    const dealData = await dealRes.json();
+    foundDealId = dealId;
+    foundDealName = dealData.properties.dealname || `Deal #${dealId}`;
+
+    result.className = 'deal-result found';
+    result.innerHTML = `<strong>✓ ${contactName} — ${foundDealName}</strong><div class="deal-meta">Stage: ${dealData.properties.dealstage || '—'} · Deal ID: ${dealId} · Contact ID: ${contact.id}</div>`;
+    fallback.classList.remove('show');
+
+    // Pre-fill address if empty
+    if (!document.getElementById('f-address').value && contact.properties.address) {
+      document.getElementById('f-address').value = contact.properties.address;
+    }
+
+  } catch (err) {
+    result.className = 'deal-result not-found';
+    result.innerHTML = `❌ Search error: ${err.message}`;
+    fallback.classList.add('show');
+  }
+}
+
+// ── CREATE FALLBACK: NEW CONTACT + DEAL ──
+async function createContactAndDeal() {
+  const firstName = document.getElementById('new-first').value.trim();
+  const lastName  = document.getElementById('new-last').value.trim();
+  const phone     = document.getElementById('new-phone').value.trim();
+  const email     = document.getElementById('new-email').value.trim();
+  const source    = document.getElementById('new-source').value;
+  const btn       = document.getElementById('btn-create');
+  const status    = document.getElementById('create-status');
+  const existingContactId = btn.dataset.existingContactId || null;
+
+  if (!firstName || !lastName || !phone) {
+    status.className = 'create-status show error';
+    status.textContent = '⚠ First name, last name, and phone are required.';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Creating…';
+  status.className = 'create-status';
+
+  try {
+    let contactId = existingContactId;
+
+    // Only create contact if we don't already have one
+    if (!contactId) {
+      const contactRes = await fetch('https://api.hubapi.com/crm/v3/objects/contacts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+        body: JSON.stringify({
+          properties: {
+            firstname: firstName, lastname: lastName, phone,
+            ...(email && { email }),
+            lead_source_detail: source,
+            hs_lead_status: 'NEW',
+          }
+        })
+      });
+
+      if (!contactRes.ok) {
+        const err = await contactRes.json();
+        // Duplicate — search and grab the existing id
+        if (err.category === 'CONFLICT') {
+          const dupSearch = await fetch('https://api.hubapi.com/crm/v3/objects/contacts/search', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+            body: JSON.stringify({ filterGroups: [{ filters: [{ propertyName: 'phone', operator: 'EQ', value: phone.replace(/\D/g,'') }] }], properties: ['id'], limit: 1 })
+          });
+          const dupData = await dupSearch.json();
+          if (dupData.results && dupData.results.length > 0) {
+            contactId = dupData.results[0].id;
+          } else {
+            throw new Error('Duplicate contact detected but could not retrieve ID. Check HubSpot manually.');
+          }
+        } else {
+          throw new Error(err.message || 'Contact creation failed');
+        }
+      } else {
+        const contactData = await contactRes.json();
+        contactId = contactData.id;
+      }
+    }
+
+    foundContactId = contactId;
+
+    // Create deal
+    const dealName = `${firstName} ${lastName} — Solar — ${new Date().toLocaleDateString('en-US',{month:'short',year:'numeric'})}`;
+    const dealRes = await fetch('https://api.hubapi.com/crm/v3/objects/deals', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+      body: JSON.stringify({
+        properties: {
+          dealname: dealName,
+          pipeline: 'default',
+          dealstage: 'appointmentscheduled',
+          description: `Created from Site Survey form — ${new Date().toLocaleDateString()}`,
+        },
+        associations: [{
+          to: { id: contactId },
+          types: [{ associationCategory: 'HUBSPOT_DEFINED', associationTypeId: 3 }]
+        }]
+      })
+    });
+
+    if (!dealRes.ok) {
+      const err = await dealRes.json();
+      throw new Error(err.message || 'Deal creation failed');
+    }
+
+    const dealData = await dealRes.json();
+    foundDealId = dealData.id;
+    foundDealName = dealName;
+
+    // Update the deal result panel to show success
+    const result = document.getElementById('deal-result');
+    result.className = 'deal-result found';
+    result.innerHTML = `<strong>✓ ${firstName} ${lastName} — ${dealName}</strong><div class="deal-meta">Newly created · Deal ID: ${foundDealId} · Contact ID: ${contactId}</div>`;
+
+    status.className = 'create-status show success';
+    status.innerHTML = `✓ Contact + Deal created. Survey will attach to this deal when you submit.<br><small>You can now fill out the rest of the form.</small>`;
+    btn.textContent = '✓ Created';
+    document.getElementById('create-fallback').style.borderColor = 'rgba(46,125,50,0.4)';
+
+    // Pre-fill address field from what user may have already entered
+    updateProgress();
+
+  } catch (err) {
+    status.className = 'create-status show error';
+    status.innerHTML = `❌ ${err.message}`;
+    btn.disabled = false;
+    btn.textContent = existingContactId ? 'Create Deal for This Contact' : 'Create Contact + Deal in HubSpot';
+  }
+}
+
+// ── CONDITIONAL WARNINGS ──
+function checkOwner() {
+  const v = document.querySelector('input[name="owner"]:checked');
+  document.getElementById('warn-renter').classList.toggle('show', v && v.value.includes('Renter'));
+}
+function checkRoofAge() {
+  const v = document.querySelector('input[name="roofage"]:checked');
+  document.getElementById('warn-roofage').classList.toggle('show', v && v.value.includes('20+'));
+}
+function checkRoofCond() {
+  const v = document.querySelector('input[name="roofcond"]:checked');
+  document.getElementById('warn-roofcond').classList.toggle('show', v && v.value.includes('Poor'));
+}
+function checkAzimuth() {
+  const v = document.querySelector('input[name="azimuth"]:checked');
+  document.getElementById('warn-azimuth').classList.toggle('show', v && v.value.includes('North'));
+}
+function checkPanel() {
+  const v = document.querySelector('input[name="amps"]:checked');
+  document.getElementById('warn-panel-amps').classList.toggle('show', v && v.value === '100A');
+}
+function checkPanelBrand() {
+  const v = document.querySelector('input[name="panelbrand"]:checked');
+  document.getElementById('warn-panel-brand').classList.toggle('show', v && (v.value.includes('FPE') || v.value.includes('Zinsco')));
+}
+
+// Wire up all warning triggers
+document.querySelectorAll('input[name="owner"]').forEach(e => e.addEventListener('change', checkOwner));
+document.querySelectorAll('input[name="roofage"]').forEach(e => e.addEventListener('change', checkRoofAge));
+document.querySelectorAll('input[name="roofcond"]').forEach(e => e.addEventListener('change', checkRoofCond));
+document.querySelectorAll('input[name="azimuth"]').forEach(e => e.addEventListener('change', checkAzimuth));
+document.querySelectorAll('input[name="amps"]').forEach(e => e.addEventListener('change', checkPanel));
+document.querySelectorAll('input[name="panelbrand"]').forEach(e => e.addEventListener('change', checkPanelBrand));
+
+// ── PHOTO COUNTER ──
+function updatePhotoCount() {
+  const done = [...document.querySelectorAll('.photo-check')].filter(b => b.checked).length;
+  document.getElementById('photo-counter').textContent = `${done} / 8 photos checked`;
+  updateProgress();
+}
+
+// ── PROGRESS ──
+function updateProgress() {
+  const required = [
+    document.getElementById('f-address').value.trim(),
+    document.querySelector('input[name="owner"]:checked'),
+    document.querySelector('input[name="roofmat"]:checked'),
+    document.querySelector('input[name="amps"]:checked'),
+  ];
+  const filled = required.filter(v => v && (typeof v === 'string' ? v : true)).length;
+  document.getElementById('progress').style.width = (filled / required.length * 100) + '%';
+}
+
+// ── HELPERS ──
+function getRadio(name) { const el = document.querySelector(`input[name="${name}"]:checked`); return el ? el.value : '—'; }
+function getToggle(id) { return document.getElementById(id).checked ? 'Yes' : 'No'; }
+function getFlags() {
+  const map = {
+    'flag-struct': 'Structural concern',
+    'flag-roof-replace': 'Roof replacement needed',
+    'flag-panel-upgrade': 'Panel upgrade required',
+    'flag-hoa': 'HOA approval pending',
+    'flag-trees': 'Tree trimming needed',
+    'flag-asbestos': 'Possible asbestos/hazmat',
+    'flag-other': 'Other (see notes)'
+  };
+  return Object.entries(map).filter(([id]) => document.getElementById(id).checked).map(([,v]) => v);
+}
+function getPhotoCount() {
+  const done = [...document.querySelectorAll('.photo-check')].filter(b => b.checked).length;
+  return `${done}/8`;
+}
+
+// ── MODAL ──
+function showModal() {
+  const flags = getFlags();
+  const rows = [
+    ['DEAL', null],
+    ['HubSpot Deal', foundDealName || '⚠ No deal linked — will attach to contact only'],
+    ['Drive Folder', document.getElementById('f-drive-url').value || '— not entered'],
+    ['PROPERTY', null],
+    ['Address', document.getElementById('f-address').value || '—'],
+    ['Ownership', getRadio('owner')],
+    ['HOA', getRadio('hoa')],
+    ['AHJ', getRadio('ahj')],
+    ['ROOF', null],
+    ['Material', getRadio('roofmat')],
+    ['Age', getRadio('roofage')],
+    ['Condition', getRadio('roofcond')],
+    ['Azimuth', getRadio('azimuth')],
+    ['Usable Area', document.getElementById('f-roofarea').value ? document.getElementById('f-roofarea').value + ' sq ft' : '—'],
+    ['Pitch', getRadio('pitch')],
+    ['Shading', getRadio('shade')],
+    ['Shading Notes', document.getElementById('f-shadenotes').value || '—'],
+    ['ELECTRICAL', null],
+    ['Panel Amps', getRadio('amps')],
+    ['Panel Brand', getRadio('panelbrand')],
+    ['Open Slots', document.getElementById('f-slots').value || '—'],
+    ['Panel Upgrade', getRadio('panelupgrade')],
+    ['Meter', getRadio('meter')],
+    ['Attic Access', getRadio('attic')],
+    ['Wi-Fi', getRadio('wifi')],
+    ['STORAGE & EV', null],
+    ['Powerwall', getToggle('t-powerwall')],
+    ['Enphase Battery', getToggle('t-enphase-batt')],
+    ['EV Charger', getToggle('t-ev')],
+    ['Whole-Home Backup', getToggle('t-backup')],
+    ['Battery Location', getRadio('battloc')],
+    ['FLAGS', null],
+    ['Active Flags', flags.length > 0 ? flags.join(' · ') : 'None'],
+    ['NOTES', null],
+    ['Notes', document.getElementById('f-notes').value || '—'],
+    ['Photos Checked', getPhotoCount()],
+  ];
+
+  const body = document.getElementById('modal-body');
+  body.innerHTML = rows.map(([k, v]) => {
+    if (v === null) return `<div class="summary-section-title">${k}</div>`;
+    return `<div class="summary-row"><span class="summary-key">${k}</span><span class="summary-val">${v}</span></div>`;
+  }).join('');
+
+  document.getElementById('submit-status').className = 'submit-status';
+  document.getElementById('hs-submit-btn').disabled = false;
+  document.getElementById('hs-submit-btn').textContent = 'Push to HubSpot';
+  document.getElementById('modal').classList.add('show');
+}
+function closeModal() { document.getElementById('modal').classList.remove('show'); }
+
+// ── HUBSPOT SUBMIT ──
+async function submitToHubSpot() {
+  if (!apiKey) { showStatus('error', '⚠ No API key connected. Close and connect HubSpot first.'); return; }
+
+  const btn = document.getElementById('hs-submit-btn');
+  btn.disabled = true;
+  btn.textContent = 'Submitting…';
+
+  const noteText = buildNoteText();
+  const driveUrl = document.getElementById('f-drive-url').value.trim();
+
+  try {
+    // 1. Update deal stage + drive URL (if deal found)
+    if (foundDealId) {
+      const dealUpdate = {
+        properties: {
+          dealstage: 'qualifiedtobuy', // maps to "Site Survey Complete" — adjust to your pipeline stage ID
+          ...(driveUrl && { description: `Drive: ${driveUrl}` }),
+        }
+      };
+      const updateRes = await fetch(`https://api.hubapi.com/crm/v3/objects/deals/${foundDealId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+        body: JSON.stringify(dealUpdate)
+      });
+      if (!updateRes.ok) {
+        const err = await updateRes.json();
+        console.warn('Deal update warning:', err.message);
+        // Non-fatal — continue with note
+      }
+    }
+
+    // 2. Log full survey note
+    const noteBody = {
+      properties: { hs_note_body: noteText, hs_timestamp: Date.now().toString() },
+      associations: []
+    };
+    if (foundContactId) noteBody.associations.push({ to: { id: foundContactId }, types: [{ associationCategory: 'HUBSPOT_DEFINED', associationTypeId: 202 }] });
+    if (foundDealId) noteBody.associations.push({ to: { id: foundDealId }, types: [{ associationCategory: 'HUBSPOT_DEFINED', associationTypeId: 214 }] });
+
+    const noteRes = await fetch('https://api.hubapi.com/crm/v3/objects/notes', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+      body: JSON.stringify(noteBody)
+    });
+    if (!noteRes.ok) {
+      const err = await noteRes.json();
+      throw new Error(err.message || 'Note creation failed');
+    }
+
+    // 3. Log a task for proposal follow-up
+    if (foundContactId) {
+      const taskBody = {
+        properties: {
+          hs_task_subject: `📐 Proposal due — ${foundDealName || 'Site Survey Complete'}`,
+          hs_task_body: `Site survey complete. Build proposal within 48 hours.`,
+          hs_timestamp: (Date.now() + 48 * 60 * 60 * 1000).toString(), // due in 48 hrs
+          hs_task_status: 'NOT_STARTED',
+          hs_task_type: 'TODO',
+        },
+        associations: [
+          { to: { id: foundContactId }, types: [{ associationCategory: 'HUBSPOT_DEFINED', associationTypeId: 204 }] },
+          ...(foundDealId ? [{ to: { id: foundDealId }, types: [{ associationCategory: 'HUBSPOT_DEFINED', associationTypeId: 216 }] }] : [])
+        ]
+      };
+      await fetch('https://api.hubapi.com/crm/v3/objects/tasks', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+        body: JSON.stringify(taskBody)
+      });
+    }
+
+    const flags = getFlags();
+    showStatus('success',
+      `✓ Survey data pushed to HubSpot.<br>` +
+      `<br>` +
+      `<strong>What was done:</strong><br>` +
+      `• Full survey note logged on ${foundDealId ? 'Deal + Contact' : 'Contact'}<br>` +
+      `${foundDealId ? '• Deal stage advanced → Site Survey Complete<br>' : ''}` +
+      `${foundContactId ? '• Task created: Proposal due in 48 hours<br>' : ''}` +
+      `${flags.length > 0 ? `• ⚠ Active flags: ${flags.join(', ')}<br>` : ''}` +
+      `<br>Next: open HubSpot to set proposal amount and confirm deal stage.`
+    );
+    btn.textContent = '✓ Done';
+
+  } catch (err) {
+    showStatus('error', `❌ ${err.message}<br><small>Check API key scopes: contacts, deals, notes, tasks (write).</small>`);
+    btn.disabled = false;
+    btn.textContent = 'Retry';
+  }
+}
+
+function buildNoteText() {
+  const flags = getFlags();
+  const photoDone = [...document.querySelectorAll('.photo-check')].filter(b => b.checked).length;
+  return [
+    `SITE SURVEY — ${new Date().toLocaleString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'})}`,
+    foundDealName ? `Deal: ${foundDealName}` : '',
+    document.getElementById('f-drive-url').value ? `Drive: ${document.getElementById('f-drive-url').value}` : '',
+    '',
+    `ADDRESS: ${document.getElementById('f-address').value || '—'}`,
+    `OWNER: ${getRadio('owner')} | HOA: ${getRadio('hoa')} | AHJ: ${getRadio('ahj')}`,
+    '',
+    `ROOF: ${getRadio('roofmat')} | Age: ${getRadio('roofage')} | Condition: ${getRadio('roofcond')}`,
+    `Azimuth: ${getRadio('azimuth')} | Pitch: ${getRadio('pitch')} | Area: ${document.getElementById('f-roofarea').value || '—'} sq ft`,
+    `Shading: ${getRadio('shade')}${document.getElementById('f-shadenotes').value ? ' — ' + document.getElementById('f-shadenotes').value : ''}`,
+    '',
+    `ELECTRICAL: ${getRadio('amps')} | Brand: ${getRadio('panelbrand')} | Slots: ${document.getElementById('f-slots').value || '—'}`,
+    `Panel Upgrade: ${getRadio('panelupgrade')} | Meter: ${getRadio('meter')} | Attic: ${getRadio('attic')} | Wi-Fi: ${getRadio('wifi')}`,
+    '',
+    `STORAGE: Powerwall: ${getToggle('t-powerwall')} | Enphase: ${getToggle('t-enphase-batt')} | EV: ${getToggle('t-ev')} | Whole-home backup: ${getToggle('t-backup')}`,
+    `Battery location: ${getRadio('battloc')}`,
+    '',
+    flags.length > 0 ? `⚠ FLAGS: ${flags.join(' · ')}` : 'FLAGS: None',
+    '',
+    `NOTES: ${document.getElementById('f-notes').value || 'None'}`,
+    `PHOTOS: ${photoDone}/8 checklist items captured`,
+  ].filter(l => l !== null).join('\n');
+}
+
+function showStatus(type, html) {
+  const el = document.getElementById('submit-status');
+  el.className = `submit-status show ${type}`;
+  el.innerHTML = html;
+}
+
+function clearForm() {
+  if (confirm('Clear all form data?')) location.reload();
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Pre-Qual Capture · Sagebrush Energy</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F7F4EE;
+    --surface: #FFFFFF;
+    --border: #DDD8CE;
+    --ink: #1A1510;
+    --muted: #8A8178;
+    --sun: #E8581A;
+    --sun-light: #FDF0E8;
+    --sun-dark: #C94D15;
+    --sage: #4A6741;
+    --sage-light: #EFF4EE;
+    --caution: #C8860A;
+    --caution-light: #FEF8EC;
+    --success: #2E7D32;
+    --success-light: #EFF7EF;
+    --danger: #C0392B;
+    --danger-light: #FDECEA;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body { background: var(--bg); font-family: 'IBM Plex Sans', sans-serif; color: var(--ink); min-height: 100vh; padding-bottom: 130px; }
+
+  /* ── HEADER ── */
+  .app-header {
+    background: var(--ink);
+    padding: 14px 20px;
+    position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .app-header h1 { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; color: #F5A623; letter-spacing: 0.05em; font-weight: 500; }
+  .live-badge { background: var(--sun); color: white; font-family: 'IBM Plex Mono', monospace; font-size: 0.62rem; padding: 3px 8px; border-radius: 2px; letter-spacing: 0.08em; animation: pulse 1.5s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.65} }
+
+  /* ── PROGRESS ── */
+  .progress-bar { background: var(--border); height: 3px; position: sticky; top: 49px; z-index: 99; }
+  .progress-fill { background: var(--sun); height: 100%; width: 0%; transition: width 0.3s ease; }
+
+  /* ── API CONFIG BANNER ── */
+  .config-banner {
+    margin: 14px 16px 0;
+    background: var(--caution-light);
+    border: 1px solid rgba(200,134,10,0.3);
+    border-left: 4px solid var(--caution);
+    border-radius: 6px;
+    padding: 12px 16px;
+  }
+  .config-banner.connected {
+    background: var(--success-light);
+    border-color: rgba(46,125,50,0.3);
+    border-left-color: var(--success);
+  }
+  .config-banner h3 { font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--caution); margin-bottom: 8px; }
+  .config-banner.connected h3 { color: var(--success); }
+  .api-row { display: flex; gap: 8px; align-items: center; }
+  .api-row input {
+    flex: 1; background: white; border: 1.5px solid rgba(200,134,10,0.3); border-radius: 6px;
+    padding: 8px 12px; font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem; color: var(--ink);
+    outline: none;
+  }
+  .api-row input:focus { border-color: var(--caution); }
+  .btn-connect {
+    background: var(--caution); color: white; border: none; border-radius: 6px;
+    padding: 8px 14px; font-family: 'IBM Plex Sans', monospace; font-size: 0.78rem;
+    font-weight: 600; cursor: pointer; white-space: nowrap;
+  }
+  .btn-connect.ok { background: var(--success); }
+  .config-note { font-size: 0.72rem; color: var(--caution); margin-top: 6px; line-height: 1.5; }
+  .config-note.ok { color: var(--success); }
+
+  /* ── SECTIONS ── */
+  .section { margin: 14px 16px 0; background: var(--surface); border-radius: 8px; border: 1px solid var(--border); overflow: hidden; }
+  .section-header { padding: 13px 16px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--border); }
+  .section-num { font-family: 'IBM Plex Mono', monospace; font-size: 0.62rem; font-weight: 600; color: white; background: var(--sun); width: 22px; height: 22px; border-radius: 4px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .section-title { font-weight: 600; font-size: 0.88rem; color: var(--ink); flex: 1; }
+  .script-toggle { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; color: var(--sun); cursor: pointer; padding: 3px 8px; border: 1px solid rgba(232,88,26,0.3); border-radius: 3px; background: var(--sun-light); white-space: nowrap; }
+
+  /* ── SCRIPT BOXES ── */
+  .script-box { display: none; margin: 0 16px 12px; padding: 12px 14px; background: var(--caution-light); border-left: 3px solid var(--caution); border-radius: 0 6px 6px 0; font-size: 0.8rem; line-height: 1.7; color: #5a4000; font-style: italic; }
+  .script-box.show { display: block; }
+  .script-box strong { font-style: normal; color: var(--caution); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em; display: block; margin-bottom: 4px; }
+
+  /* ── FIELDS ── */
+  .field { padding: 11px 16px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 6px; }
+  .field:last-child { border-bottom: none; }
+  .field label { font-size: 0.68rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.09em; font-family: 'IBM Plex Mono', monospace; }
+  .field label .req { color: var(--sun); margin-left: 2px; }
+
+  input[type="text"], input[type="number"], input[type="tel"], input[type="email"], select, textarea {
+    width: 100%; background: var(--bg); border: 1.5px solid var(--border); border-radius: 6px;
+    padding: 10px 12px; font-family: 'IBM Plex Sans', sans-serif; font-size: 0.95rem; color: var(--ink);
+    outline: none; transition: border-color 0.15s; -webkit-appearance: none; appearance: none;
+  }
+  input:focus, select:focus, textarea:focus { border-color: var(--sun); background: white; }
+  textarea { resize: none; min-height: 64px; line-height: 1.5; }
+  select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238A8178' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 12px center; padding-right: 36px;
+  }
+
+  /* ── PILLS ── */
+  .pill-group { display: flex; flex-wrap: wrap; gap: 7px; }
+  .pill-group input { display: none; }
+  .pill-group label {
+    display: inline-flex; align-items: center; padding: 7px 13px; border-radius: 20px;
+    border: 1.5px solid var(--border); font-size: 0.82rem; color: var(--ink); cursor: pointer;
+    transition: all 0.12s; text-transform: none; letter-spacing: 0; font-family: 'IBM Plex Sans', sans-serif;
+    background: var(--bg);
+  }
+  .pill-group input:checked + label { background: var(--sun); border-color: var(--sun); color: white; font-weight: 500; }
+  .pill-group.green input:checked + label { background: var(--success); border-color: var(--success); }
+  .pill-group.red input:checked + label { background: var(--danger); border-color: var(--danger); }
+
+  /* ── DISQUALIFY BANNER ── */
+  .disqual-warn {
+    display: none; margin: 0 16px 12px;
+    background: var(--danger-light); border: 1px solid rgba(192,57,43,0.3); border-left: 4px solid var(--danger);
+    border-radius: 6px; padding: 10px 14px; font-size: 0.82rem; color: var(--danger); line-height: 1.5;
+  }
+  .disqual-warn.show { display: block; }
+
+  /* ── SCORE METER ── */
+  .score-section { margin: 14px 16px 0; background: var(--surface); border-radius: 8px; border: 1px solid var(--border); overflow: hidden; }
+  .score-header { padding: 13px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .score-header h3 { font-weight: 600; font-size: 0.88rem; }
+  .score-value { font-family: 'IBM Plex Mono', monospace; font-size: 1.2rem; font-weight: 600; color: var(--muted); transition: color 0.3s; }
+  .score-value.hot { color: var(--sun); }
+  .score-value.warm { color: var(--caution); }
+  .score-value.cold { color: var(--danger); }
+  .score-track { height: 8px; background: var(--border); margin: 0 16px 14px; border-radius: 4px; overflow: hidden; }
+  .score-fill { height: 100%; background: var(--muted); border-radius: 4px; width: 0%; transition: width 0.4s ease, background 0.3s; }
+  .score-fill.hot { background: var(--sun); }
+  .score-fill.warm { background: var(--caution); }
+  .score-fill.cold { background: var(--danger); }
+  .score-label { padding: 0 16px 14px; font-size: 0.78rem; color: var(--muted); font-family: 'IBM Plex Mono', monospace; }
+
+  /* ── NEXT STEP ── */
+  .next-step-section { margin: 14px 16px 0; }
+  .next-step-box {
+    background: var(--sun-light); border: 1px solid rgba(232,88,26,0.25); border-radius: 8px;
+    padding: 14px 16px;
+  }
+  .next-step-box h3 { font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--sun); margin-bottom: 8px; }
+  .next-step-box p { font-size: 0.85rem; line-height: 1.6; color: var(--ink); }
+  .next-step-box select { margin-top: 10px; }
+
+  /* ── BOTTOM BAR ── */
+  .bottom-bar {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: white; border-top: 1px solid var(--border);
+    padding: 12px 16px; display: flex; gap: 10px; z-index: 100;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+  }
+  .btn-secondary { flex: 1; padding: 13px; background: var(--bg); border: 1.5px solid var(--border); border-radius: 8px; font-family: 'IBM Plex Sans', sans-serif; font-size: 0.85rem; font-weight: 500; color: var(--muted); cursor: pointer; }
+  .btn-primary { flex: 2.5; padding: 13px; background: var(--sun); border: none; border-radius: 8px; font-family: 'IBM Plex Sans', sans-serif; font-size: 0.9rem; font-weight: 600; color: white; cursor: pointer; }
+  .btn-primary:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; }
+  .btn-primary:active:not(:disabled) { background: var(--sun-dark); }
+
+  /* ── MODAL ── */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.65); z-index: 200; padding: 20px; overflow-y: auto; align-items: flex-start; justify-content: center; padding-top: 30px; }
+  .modal-overlay.show { display: flex; }
+  .modal { background: white; border-radius: 12px; width: 100%; max-width: 480px; overflow: hidden; }
+  .modal-header { background: var(--ink); padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; }
+  .modal-header h2 { font-family: 'IBM Plex Mono', monospace; font-size: 0.82rem; color: #F5A623; font-weight: 500; }
+  .modal-close { color: white; font-size: 1.1rem; cursor: pointer; background: none; border: none; line-height: 1; }
+  .modal-body { padding: 16px 20px; max-height: 60vh; overflow-y: auto; }
+  .summary-section-title { font-family: 'IBM Plex Mono', monospace; font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); padding: 10px 0 4px; border-bottom: 1px solid var(--border); margin-bottom: 2px; }
+  .summary-row { display: flex; gap: 10px; padding: 7px 0; border-bottom: 1px solid rgba(0,0,0,0.04); }
+  .summary-key { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; color: var(--muted); min-width: 120px; padding-top: 1px; text-transform: uppercase; }
+  .summary-val { font-size: 0.82rem; color: var(--ink); font-weight: 500; flex: 1; }
+  .modal-footer { padding: 12px 20px; background: var(--bg); border-top: 1px solid var(--border); display: flex; gap: 10px; }
+
+  /* ── SUBMIT STATUS ── */
+  .submit-status { padding: 14px 16px; font-size: 0.85rem; line-height: 1.6; display: none; }
+  .submit-status.show { display: block; }
+  .submit-status.success { background: var(--success-light); color: var(--success); }
+  .submit-status.error { background: var(--danger-light); color: var(--danger); }
+  .submit-status a { color: inherit; font-weight: 600; }
+
+  code { font-family: 'IBM Plex Mono', monospace; background: rgba(0,0,0,0.07); padding: 2px 5px; border-radius: 3px; font-size: 0.8em; }
+</style>
+</head>
+<body>
+
+<div class="app-header">
+  <h1>SAGEBRUSH · PRE-QUAL CAPTURE</h1>
+  <span class="live-badge">● LIVE CALL</span>
+</div>
+<div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+<!-- API CONFIG -->
+<div class="config-banner" id="config-banner">
+  <h3>⚙ HubSpot API Key Required</h3>
+  <div class="api-row">
+    <input type="password" id="hs-api-key" placeholder="pat-na1-xxxxxxxx-xxxx-..." autocomplete="off">
+    <button class="btn-connect" onclick="saveApiKey()">Connect</button>
+  </div>
+  <div class="config-note" id="config-note">
+    HubSpot → Settings → Account Setup → Integrations → Private Apps → create app with <code>contacts</code> + <code>crm.objects.deals</code> scopes. Key stored locally in this browser only.
+  </div>
+</div>
+
+<!-- SECTION 1: CONTACT -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">1</div>
+    <span class="section-title">Contact Info</span>
+    <span class="script-toggle" onclick="toggleScript('s1')">Script ▾</span>
+  </div>
+  <div class="script-box" id="s1">
+    <strong>Opening — say this</strong>
+    "Hi [Name], this is Bill with Sagebrush Energy — I'm so sorry for the delay getting back to you, I really appreciate your patience. You're on my radar now. Got a few minutes to talk about your solar project?"
+  </div>
+  <div class="field"><label>First Name <span class="req">*</span></label><input type="text" id="f-first" placeholder="Leslie" oninput="updateAll()"></div>
+  <div class="field"><label>Last Name <span class="req">*</span></label><input type="text" id="f-last" placeholder="Davis" oninput="updateAll()"></div>
+  <div class="field"><label>Phone <span class="req">*</span></label><input type="tel" id="f-phone" placeholder="775-327-4663" oninput="updateAll()"></div>
+  <div class="field"><label>Email</label><input type="email" id="f-email" placeholder="leslie@email.com" oninput="updateAll()"></div>
+  <div class="field">
+    <label>Lead Source <span class="req">*</span></label>
+    <div class="pill-group">
+      <input type="radio" name="source" id="src-web" value="Website Form" onchange="updateAll()"><label for="src-web">Website Form</label>
+      <input type="radio" name="source" id="src-ref" value="Referral" onchange="updateAll()"><label for="src-ref">Referral</label>
+      <input type="radio" name="source" id="src-canv" value="Canvass" onchange="updateAll()"><label for="src-canv">Canvass</label>
+      <input type="radio" name="source" id="src-repeat" value="Repeat Customer" onchange="updateAll()"><label for="src-repeat">Repeat</label>
+      <input type="radio" name="source" id="src-other" value="Other" onchange="updateAll()"><label for="src-other">Other</label>
+    </div>
+  </div>
+  <div class="field" id="ref-field" style="display:none;">
+    <label>Referred By</label>
+    <input type="text" id="f-referrer" placeholder="Name of referring customer">
+  </div>
+</div>
+
+<!-- SECTION 2: PROPERTY -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">2</div>
+    <span class="section-title">Property Qualification</span>
+    <span class="script-toggle" onclick="toggleScript('s2')">Script ▾</span>
+  </div>
+  <div class="script-box" id="s2">
+    <strong>Ask this</strong>
+    "Can I get the address of the property? And just to confirm — you're the homeowner, not renting?" — pause — "And do you have an HOA? Sometimes they have approval requirements for solar."
+  </div>
+  <div class="field"><label>Property Address <span class="req">*</span></label><input type="text" id="f-address" placeholder="123 Sun Valley Dr, Reno NV 89502" oninput="updateAll()"></div>
+  <div class="field">
+    <label>Homeowner? <span class="req">*</span></label>
+    <div class="pill-group green">
+      <input type="radio" name="owner" id="own-yes" value="Yes" onchange="updateAll(); checkDQ()"><label for="own-yes">✓ Yes — Owner</label>
+      <input type="radio" name="owner" id="own-no" value="No — Renter" onchange="updateAll(); checkDQ()"><label for="own-no">✗ Renter</label>
+      <input type="radio" name="owner" id="own-trust" value="Trust/LLC" onchange="updateAll(); checkDQ()"><label for="own-trust">Trust / LLC</label>
+    </div>
+  </div>
+  <div class="disqual-warn" id="dq-renter">
+    ⛔ Renter — cannot proceed. Politely explain solar requires homeowner approval. Log as Disqualified in HubSpot.
+  </div>
+  <div class="field">
+    <label>HOA</label>
+    <div class="pill-group">
+      <input type="radio" name="hoa" id="hoa-no" value="No HOA" onchange="updateAll()"><label for="hoa-no">No HOA</label>
+      <input type="radio" name="hoa" id="hoa-pend" value="HOA — approval pending" onchange="updateAll()"><label for="hoa-pend">HOA — needs approval</label>
+      <input type="radio" name="hoa" id="hoa-ok" value="HOA — approved" onchange="updateAll()"><label for="hoa-ok">HOA — approved</label>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 3: FINANCIAL FIT -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">3</div>
+    <span class="section-title">Financial Fit</span>
+    <span class="script-toggle" onclick="toggleScript('s3')">Script ▾</span>
+  </div>
+  <div class="script-box" id="s3">
+    <strong>Ask this</strong>
+    "What's your average NV Energy bill — roughly? Just a ballpark is fine." — pause — "And are you thinking cash purchase, or would financing options be helpful to look at?"
+  </div>
+  <div class="field">
+    <label>Monthly NV Energy Bill <span class="req">*</span></label>
+    <div class="pill-group">
+      <input type="radio" name="bill" id="bill-u100" value="Under $100" onchange="updateAll(); checkDQ()"><label for="bill-u100">Under $100</label>
+      <input type="radio" name="bill" id="bill-100" value="$100–$150" onchange="updateAll(); checkDQ()"><label for="bill-100">$100–$150</label>
+      <input type="radio" name="bill" id="bill-150" value="$150–$250" onchange="updateAll(); checkDQ()"><label for="bill-150">$150–$250 ✓</label>
+      <input type="radio" name="bill" id="bill-250" value="$250–$400" onchange="updateAll(); checkDQ()"><label for="bill-250">$250–$400 ✓</label>
+      <input type="radio" name="bill" id="bill-400" value="$400+" onchange="updateAll(); checkDQ()"><label for="bill-400">$400+ ★</label>
+    </div>
+  </div>
+  <div class="disqual-warn" id="dq-bill">
+    ⚠ Low bill — ROI math may be marginal. Still proceed to survey but set expectations: payback could be 12–15 years at this usage level.
+  </div>
+  <div class="field">
+    <label>Payment Preference</label>
+    <div class="pill-group">
+      <input type="radio" name="payment" id="pay-cash" value="Cash" onchange="updateAll()"><label for="pay-cash">Cash</label>
+      <input type="radio" name="payment" id="pay-loan" value="Loan (Mosaic/GoodLeap)" onchange="updateAll()"><label for="pay-loan">Loan</label>
+      <input type="radio" name="payment" id="pay-either" value="Either — show options" onchange="updateAll()"><label for="pay-either">Show options</label>
+      <input type="radio" name="payment" id="pay-unk" value="Unknown" onchange="updateAll()"><label for="pay-unk">Not sure yet</label>
+    </div>
+  </div>
+  <div class="field">
+    <label>Credit Comfort (for loan routing)</label>
+    <div class="pill-group">
+      <input type="radio" name="credit" id="cr-good" value="Good (680+)" onchange="updateAll()"><label for="cr-good">Good 680+</label>
+      <input type="radio" name="credit" id="cr-fair" value="Fair (620–679)" onchange="updateAll()"><label for="cr-fair">Fair 620–679</label>
+      <input type="radio" name="credit" id="cr-unk" value="Prefer not to say" onchange="updateAll()"><label for="cr-unk">Prefer not to say</label>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 4: SYSTEM INTEREST -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">4</div>
+    <span class="section-title">System Interest</span>
+    <span class="script-toggle" onclick="toggleScript('s4')">Script ▾</span>
+  </div>
+  <div class="script-box" id="s4">
+    <strong>Ask this</strong>
+    "Are you looking at just solar panels, or also battery backup? We install Tesla Powerwall and Enphase batteries. And do you have an EV or are you thinking about one?" — pause — "Any goals beyond the bill — backup power, going fully off-grid?"
+  </div>
+  <div class="field">
+    <label>Primary Interest <span class="req">*</span></label>
+    <div class="pill-group">
+      <input type="radio" name="interest" id="int-solar" value="Solar only" onchange="updateAll()"><label for="int-solar">Solar only</label>
+      <input type="radio" name="interest" id="int-solarbatt" value="Solar + Battery" onchange="updateAll()"><label for="int-solarbatt">Solar + Battery</label>
+      <input type="radio" name="interest" id="int-batt" value="Battery only" onchange="updateAll()"><label for="int-batt">Battery only</label>
+      <input type="radio" name="interest" id="int-all" value="Solar + Battery + EV charger" onchange="updateAll()"><label for="int-all">Full package</label>
+    </div>
+  </div>
+  <div class="field">
+    <label>Battery Brand Preference</label>
+    <div class="pill-group">
+      <input type="radio" name="battery" id="bat-pw" value="Tesla Powerwall"><label for="bat-pw">Tesla Powerwall</label>
+      <input type="radio" name="battery" id="bat-enph" value="Enphase IQ Battery"><label for="bat-enph">Enphase IQ</label>
+      <input type="radio" name="battery" id="bat-open" value="No preference"><label for="bat-open">No preference</label>
+      <input type="radio" name="battery" id="bat-none" value="Not interested"><label for="bat-none">Not interested</label>
+    </div>
+  </div>
+  <div class="field">
+    <label>Key Goal</label>
+    <div class="pill-group">
+      <input type="radio" name="goal" id="g-bill" value="Reduce electricity bill" onchange="updateAll()"><label for="g-bill">Reduce bill</label>
+      <input type="radio" name="goal" id="g-backup" value="Backup power / outage protection" onchange="updateAll()"><label for="g-backup">Backup power</label>
+      <input type="radio" name="goal" id="g-env" value="Environmental / green" onchange="updateAll()"><label for="g-env">Environmental</label>
+      <input type="radio" name="goal" id="g-value" value="Increase home value" onchange="updateAll()"><label for="g-value">Home value</label>
+      <input type="radio" name="goal" id="g-all" value="All of the above" onchange="updateAll()"><label for="g-all">All of above</label>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 5: TIMELINE & DECISION -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">5</div>
+    <span class="section-title">Timeline & Decision</span>
+    <span class="script-toggle" onclick="toggleScript('s5')">Script ▾</span>
+  </div>
+  <div class="script-box" id="s5">
+    <strong>Ask this</strong>
+    "Are you looking to move forward in the next 30, 60, or 90 days — or is this more exploratory right now?" — pause — "And is there anyone else involved in the decision — a spouse or partner you'd want on the call when we go over the proposal?"
+  </div>
+  <div class="field">
+    <label>Timeline <span class="req">*</span></label>
+    <div class="pill-group">
+      <input type="radio" name="timeline" id="tl-now" value="ASAP / within 30 days" onchange="updateAll()"><label for="tl-now">ASAP / 30 days ★</label>
+      <input type="radio" name="timeline" id="tl-60" value="30–60 days" onchange="updateAll()"><label for="tl-60">30–60 days</label>
+      <input type="radio" name="timeline" id="tl-90" value="60–90 days" onchange="updateAll()"><label for="tl-90">60–90 days</label>
+      <input type="radio" name="timeline" id="tl-explore" value="Exploratory — just looking" onchange="updateAll()"><label for="tl-explore">Just exploring</label>
+    </div>
+  </div>
+  <div class="field">
+    <label>Decision Maker(s)</label>
+    <div class="pill-group">
+      <input type="radio" name="dm" id="dm-solo" value="Solo decision" onchange="updateAll()"><label for="dm-solo">Solo</label>
+      <input type="radio" name="dm" id="dm-spouse" value="Spouse / partner also involved" onchange="updateAll()"><label for="dm-spouse">Spouse / partner</label>
+      <input type="radio" name="dm" id="dm-other" value="Other decision maker" onchange="updateAll()"><label for="dm-other">Other</label>
+    </div>
+  </div>
+  <div class="field">
+    <label>Previous Solar Quotes?</label>
+    <div class="pill-group">
+      <input type="radio" name="prev" id="prev-no" value="No — first inquiry" onchange="updateAll()"><label for="prev-no">First inquiry</label>
+      <input type="radio" name="prev" id="prev-yes" value="Yes — shopping around" onchange="updateAll()"><label for="prev-yes">Shopping around</label>
+      <input type="radio" name="prev" id="prev-prev" value="Had solar before" onchange="updateAll()"><label for="prev-prev">Had solar before</label>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 6: NEXT STEP -->
+<div class="section" id="next-step-section">
+  <div class="section-header">
+    <div class="section-num">6</div>
+    <span class="section-title">Next Step — Book Before You Hang Up</span>
+    <span class="script-toggle" onclick="toggleScript('s6')">Script ▾</span>
+  </div>
+  <div class="script-box" id="s6">
+    <strong>Close the call with this</strong>
+    "Based on what you've told me, this sounds like a great fit. I'd love to schedule a quick site visit — I come out, take a look at your roof and electrical panel, and then I can put together a real numbers proposal for you. I have [Day] at [Time] or [Day] at [Time] — which works better?"
+  </div>
+  <div class="field">
+    <label>Next Step Agreed <span class="req">*</span></label>
+    <div class="pill-group">
+      <input type="radio" name="nextstep" id="ns-survey" value="Site Survey Scheduled" onchange="updateAll()"><label for="ns-survey">✓ Survey Scheduled</label>
+      <input type="radio" name="nextstep" id="ns-send" value="Send info / follow-up email" onchange="updateAll()"><label for="ns-send">Send info first</label>
+      <input type="radio" name="nextstep" id="ns-cb" value="Call back — needs to discuss with partner" onchange="updateAll()"><label for="ns-cb">Call back</label>
+      <input type="radio" name="nextstep" id="ns-dq" value="Disqualified" onchange="updateAll()"><label for="ns-dq">Disqualified</label>
+    </div>
+  </div>
+  <div class="field" id="survey-date-field" style="display:none;">
+    <label>Survey Date / Time</label>
+    <input type="text" id="f-survey-date" placeholder="e.g. Thursday April 24 at 10am" oninput="updateAll()">
+  </div>
+  <div class="field">
+    <label>Call Notes</label>
+    <textarea id="f-notes" placeholder="Anything useful — roof concerns, neighborhood, personality, what matters to them..."></textarea>
+  </div>
+</div>
+
+<!-- SCORE -->
+<div class="score-section">
+  <div class="score-header">
+    <h3>Lead Score</h3>
+    <span class="score-value" id="score-val">—</span>
+  </div>
+  <div class="score-track"><div class="score-fill" id="score-fill"></div></div>
+  <div class="score-label" id="score-label">Fill out the form to generate a score</div>
+</div>
+
+<div style="height:14px;"></div>
+
+<div class="bottom-bar">
+  <button class="btn-secondary" onclick="clearForm()">Clear</button>
+  <button class="btn-primary" id="submit-btn" onclick="showModal()">Review & Push to HubSpot ▶</button>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>REVIEW — PUSH TO HUBSPOT</h2>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="submit-status" id="submit-status"></div>
+    <div class="modal-footer">
+      <button class="btn-secondary" style="flex:1;" onclick="closeModal()">Back</button>
+      <button class="btn-primary" style="flex:2;" id="hs-submit-btn" onclick="submitToHubSpot()">Push to HubSpot</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── API KEY MANAGEMENT ──
+let apiKey = localStorage.getItem('sg_hs_key') || '';
+if (apiKey) showConnected();
+
+function saveApiKey() {
+  const val = document.getElementById('hs-api-key').value.trim();
+  if (!val) return;
+  apiKey = val;
+  localStorage.setItem('sg_hs_key', val);
+  showConnected();
+}
+
+function showConnected() {
+  const banner = document.getElementById('config-banner');
+  const note = document.getElementById('config-note');
+  const inp = document.getElementById('hs-api-key');
+  const btn = banner.querySelector('.btn-connect');
+  banner.classList.add('connected');
+  banner.querySelector('h3').textContent = '✓ HubSpot Connected';
+  inp.value = '••••••••••••••••••••••••';
+  inp.disabled = true;
+  btn.textContent = 'Change';
+  btn.classList.add('ok');
+  btn.onclick = () => {
+    inp.disabled = false; inp.value = ''; inp.focus();
+    banner.classList.remove('connected');
+    banner.querySelector('h3').textContent = '⚙ HubSpot API Key Required';
+    btn.textContent = 'Connect'; btn.classList.remove('ok');
+    btn.onclick = saveApiKey;
+  };
+  note.textContent = '✓ Submissions will create Contact + Deal in your Solar Ops Clean pipeline.';
+  note.className = 'config-note ok';
+}
+
+// ── SCRIPT TOGGLE ──
+function toggleScript(id) {
+  const el = document.getElementById(id);
+  el.classList.toggle('show');
+}
+
+// ── CONDITIONAL FIELDS ──
+document.querySelectorAll('input[name="source"]').forEach(el => {
+  el.addEventListener('change', () => {
+    document.getElementById('ref-field').style.display = el.value === 'Referral' ? 'block' : 'none';
+  });
+});
+document.querySelectorAll('input[name="nextstep"]').forEach(el => {
+  el.addEventListener('change', () => {
+    document.getElementById('survey-date-field').style.display = el.value === 'Site Survey Scheduled' ? 'block' : 'none';
+  });
+});
+
+// ── DISQUALIFY WARNINGS ──
+function checkDQ() {
+  const owner = document.querySelector('input[name="owner"]:checked');
+  const bill = document.querySelector('input[name="bill"]:checked');
+  document.getElementById('dq-renter').classList.toggle('show', owner && owner.value === 'No — Renter');
+  document.getElementById('dq-bill').classList.toggle('show', bill && bill.value === 'Under $100');
+}
+
+// ── LEAD SCORE ──
+function calcScore() {
+  let score = 0;
+  const bill = document.querySelector('input[name="bill"]:checked');
+  const owner = document.querySelector('input[name="owner"]:checked');
+  const tl = document.querySelector('input[name="timeline"]:checked');
+  const dm = document.querySelector('input[name="dm"]:checked');
+  const ns = document.querySelector('input[name="nextstep"]:checked');
+  const interest = document.querySelector('input[name="interest"]:checked');
+
+  if (owner && owner.value === 'Yes') score += 20;
+  if (bill) {
+    if (bill.value === '$400+') score += 30;
+    else if (bill.value === '$250–$400') score += 25;
+    else if (bill.value === '$150–$250') score += 20;
+    else if (bill.value === '$100–$150') score += 10;
+  }
+  if (tl) {
+    if (tl.value.includes('ASAP')) score += 25;
+    else if (tl.value.includes('30–60')) score += 18;
+    else if (tl.value.includes('60–90')) score += 10;
+    else score += 2;
+  }
+  if (dm && dm.value === 'Solo decision') score += 10;
+  if (ns && ns.value === 'Site Survey Scheduled') score += 15;
+  if (interest && interest.value !== 'Solar only') score += 5;
+
+  return Math.min(score, 100);
+}
+
+function updateScore() {
+  const s = calcScore();
+  const val = document.getElementById('score-val');
+  const fill = document.getElementById('score-fill');
+  const label = document.getElementById('score-label');
+  if (s === 0) { val.textContent = '—'; val.className = 'score-value'; fill.style.width = '0%'; fill.className = 'score-fill'; label.textContent = 'Fill out the form to generate a score'; return; }
+  val.textContent = s + '/100';
+  fill.style.width = s + '%';
+  if (s >= 70) {
+    val.className = 'score-value hot'; fill.className = 'score-fill hot';
+    label.textContent = '🔥 Hot lead — prioritize. Survey ASAP.';
+  } else if (s >= 45) {
+    val.className = 'score-value warm'; fill.className = 'score-fill warm';
+    label.textContent = '◑ Warm — good potential. Follow standard process.';
+  } else {
+    val.className = 'score-value cold'; fill.className = 'score-fill cold';
+    label.textContent = '❄ Cool — nurture track. Set HubSpot reminder in 60 days.';
+  }
+}
+
+// ── PROGRESS BAR ──
+function updateProgress() {
+  const required = [
+    document.getElementById('f-first').value.trim(),
+    document.getElementById('f-last').value.trim(),
+    document.getElementById('f-phone').value.trim(),
+    document.getElementById('f-address').value.trim(),
+    document.querySelector('input[name="owner"]:checked'),
+    document.querySelector('input[name="bill"]:checked'),
+    document.querySelector('input[name="interest"]:checked'),
+    document.querySelector('input[name="timeline"]:checked'),
+    document.querySelector('input[name="nextstep"]:checked'),
+  ];
+  const filled = required.filter(v => v && (typeof v === 'string' ? v : true)).length;
+  document.getElementById('progress').style.width = (filled / required.length * 100) + '%';
+}
+
+function updateAll() { updateProgress(); updateScore(); }
+
+// ── MODAL SUMMARY ──
+function getVal(name) { const el = document.querySelector(`input[name="${name}"]:checked`); return el ? el.value : '—'; }
+
+function showModal() {
+  const rows = [
+    ['CONTACT', null],
+    ['Name', (document.getElementById('f-first').value + ' ' + document.getElementById('f-last').value).trim() || '—'],
+    ['Phone', document.getElementById('f-phone').value || '—'],
+    ['Email', document.getElementById('f-email').value || '—'],
+    ['Lead Source', getVal('source')],
+    ['Referred By', document.getElementById('f-referrer').value || '—'],
+    ['PROPERTY', null],
+    ['Address', document.getElementById('f-address').value || '—'],
+    ['Homeowner', getVal('owner')],
+    ['HOA', getVal('hoa')],
+    ['FINANCIAL FIT', null],
+    ['Monthly Bill', getVal('bill')],
+    ['Payment Pref', getVal('payment')],
+    ['Credit', getVal('credit')],
+    ['SYSTEM', null],
+    ['Interest', getVal('interest')],
+    ['Battery Pref', getVal('battery')],
+    ['Key Goal', getVal('goal')],
+    ['TIMELINE', null],
+    ['Timeline', getVal('timeline')],
+    ['Decision Maker', getVal('dm')],
+    ['Prior Quotes', getVal('prev')],
+    ['OUTCOME', null],
+    ['Next Step', getVal('nextstep')],
+    ['Survey Date', document.getElementById('f-survey-date').value || '—'],
+    ['Notes', document.getElementById('f-notes').value || '—'],
+    ['Lead Score', calcScore() + '/100'],
+  ];
+
+  const body = document.getElementById('modal-body');
+  body.innerHTML = rows.map(([k, v]) => {
+    if (v === null) return `<div class="summary-section-title">${k}</div>`;
+    return `<div class="summary-row"><span class="summary-key">${k}</span><span class="summary-val">${v}</span></div>`;
+  }).join('');
+
+  document.getElementById('submit-status').className = 'submit-status';
+  document.getElementById('submit-status').innerHTML = '';
+  document.getElementById('hs-submit-btn').disabled = false;
+  document.getElementById('hs-submit-btn').textContent = 'Push to HubSpot';
+  document.getElementById('modal').classList.add('show');
+}
+
+function closeModal() { document.getElementById('modal').classList.remove('show'); }
+
+// ── HUBSPOT SUBMISSION ──
+async function submitToHubSpot() {
+  if (!apiKey) {
+    showStatus('error', '⚠ No API key set. Close this modal and connect HubSpot first.');
+    return;
+  }
+
+  const btn = document.getElementById('hs-submit-btn');
+  btn.disabled = true;
+  btn.textContent = 'Submitting…';
+
+  const firstName = document.getElementById('f-first').value.trim();
+  const lastName = document.getElementById('f-last').value.trim();
+  const phone = document.getElementById('f-phone').value.trim();
+  const email = document.getElementById('f-email').value.trim();
+  const address = document.getElementById('f-address').value.trim();
+  const notes = buildNoteText();
+
+  try {
+    // 1. Create / update Contact
+    const contactPayload = {
+      properties: {
+        firstname: firstName,
+        lastname: lastName,
+        phone: phone,
+        ...(email && { email }),
+        address: address,
+        lead_source_detail: getVal('source'),
+        hs_lead_status: 'NEW',
+      }
+    };
+
+    const contactRes = await fetch('https://api.hubapi.com/crm/v3/objects/contacts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+      body: JSON.stringify(contactPayload)
+    });
+
+    if (!contactRes.ok) {
+      const err = await contactRes.json();
+      // If duplicate, search for existing
+      if (err.category === 'CONFLICT') {
+        await handleExistingContact(phone, email, notes);
+        return;
+      }
+      throw new Error(err.message || 'Contact creation failed');
+    }
+
+    const contact = await contactRes.json();
+    const contactId = contact.id;
+
+    // 2. Create Deal
+    const dealName = `${firstName} ${lastName} — Solar — ${new Date().toLocaleDateString('en-US',{month:'short',year:'numeric'})}`;
+    const dealPayload = {
+      properties: {
+        dealname: dealName,
+        pipeline: 'default',
+        dealstage: 'appointmentscheduled',
+        amount: '',
+        description: notes,
+        lead_score: String(calcScore()),
+      },
+      associations: [{
+        to: { id: contactId },
+        types: [{ associationCategory: 'HUBSPOT_DEFINED', associationTypeId: 3 }]
+      }]
+    };
+
+    const dealRes = await fetch('https://api.hubapi.com/crm/v3/objects/deals', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+      body: JSON.stringify(dealPayload)
+    });
+
+    if (!dealRes.ok) {
+      const err = await dealRes.json();
+      throw new Error(err.message || 'Deal creation failed');
+    }
+
+    const deal = await dealRes.json();
+
+    // 3. Log note
+    await logNote(contactId, deal.id, notes);
+
+    showStatus('success', `✓ Contact <strong>${firstName} ${lastName}</strong> and Deal created in HubSpot. Deal ID: ${deal.id}.<br><br>Next: open HubSpot and set the Survey Date and Deal Amount in the Solar Ops Clean pipeline.`);
+    btn.textContent = '✓ Done';
+
+  } catch (err) {
+    showStatus('error', `❌ Error: ${err.message}<br><small>Check your API key and that your Private App has <code>contacts</code> and <code>crm.objects.deals</code> scopes.</small>`);
+    btn.disabled = false;
+    btn.textContent = 'Retry';
+  }
+}
+
+async function handleExistingContact(phone, email, notes) {
+  // Search by phone
+  const searchRes = await fetch('https://api.hubapi.com/crm/v3/objects/contacts/search', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+    body: JSON.stringify({ filterGroups: [{ filters: [{ propertyName: 'phone', operator: 'EQ', value: phone }] }], properties: ['firstname','lastname','id'] })
+  });
+  const searchData = await searchRes.json();
+  if (searchData.results && searchData.results.length > 0) {
+    const contactId = searchData.results[0].id;
+    const name = (searchData.results[0].properties.firstname || '') + ' ' + (searchData.results[0].properties.lastname || '');
+    showStatus('success', `✓ Existing contact found: <strong>${name.trim()}</strong> (ID: ${contactId}). Note logged. Check HubSpot to create a new Deal manually if needed.`);
+    await logNote(contactId, null, notes);
+    document.getElementById('hs-submit-btn').textContent = '✓ Done';
+  } else {
+    showStatus('error', '⚠ Contact appears to be a duplicate but could not be found by phone. Check HubSpot manually.');
+    document.getElementById('hs-submit-btn').disabled = false;
+    document.getElementById('hs-submit-btn').textContent = 'Retry';
+  }
+}
+
+async function logNote(contactId, dealId, noteText) {
+  const body = {
+    properties: { hs_note_body: noteText, hs_timestamp: Date.now().toString() },
+    associations: []
+  };
+  if (contactId) body.associations.push({ to: { id: contactId }, types: [{ associationCategory: 'HUBSPOT_DEFINED', associationTypeId: 202 }] });
+  if (dealId) body.associations.push({ to: { id: dealId }, types: [{ associationCategory: 'HUBSPOT_DEFINED', associationTypeId: 214 }] });
+  await fetch('https://api.hubapi.com/crm/v3/objects/notes', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+    body: JSON.stringify(body)
+  });
+}
+
+function buildNoteText() {
+  const lines = [
+    `PRE-QUAL CALL — ${new Date().toLocaleString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'})}`,
+    `Lead Score: ${calcScore()}/100`,
+    '',
+    `ADDRESS: ${document.getElementById('f-address').value || '—'}`,
+    `OWNER: ${getVal('owner')} | HOA: ${getVal('hoa')}`,
+    `MONTHLY BILL: ${getVal('bill')} | PAYMENT: ${getVal('payment')} | CREDIT: ${getVal('credit')}`,
+    `INTEREST: ${getVal('interest')} | BATTERY: ${getVal('battery')} | GOAL: ${getVal('goal')}`,
+    `TIMELINE: ${getVal('timeline')} | DECISION MAKER: ${getVal('dm')} | PRIOR QUOTES: ${getVal('prev')}`,
+    `NEXT STEP: ${getVal('nextstep')}`,
+    document.getElementById('f-survey-date').value ? `SURVEY DATE: ${document.getElementById('f-survey-date').value}` : '',
+    '',
+    `NOTES: ${document.getElementById('f-notes').value || 'None'}`,
+    '',
+    `SOURCE: ${getVal('source')}${document.getElementById('f-referrer').value ? ' — Referred by: ' + document.getElementById('f-referrer').value : ''}`,
+  ].filter(l => l !== null).join('\n');
+  return lines;
+}
+
+function showStatus(type, html) {
+  const el = document.getElementById('submit-status');
+  el.className = `submit-status show ${type}`;
+  el.innerHTML = html;
+}
+
+function clearForm() {
+  if (confirm('Clear all form data?')) location.reload();
+}
+</script>
+</body>
+</html>
