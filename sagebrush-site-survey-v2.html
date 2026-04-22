@@ -697,8 +697,6 @@ async function createContactAndDeal() {
           properties: {
             firstname: firstName, lastname: lastName, phone,
             ...(email && { email }),
-            lead_source_detail: source,
-            hs_lead_status: 'NEW',
           }
         })
       });
@@ -914,16 +912,17 @@ async function submitToHubSpot() {
   btn.disabled = true;
   btn.textContent = 'Submitting…';
 
-  const noteText = buildNoteText();
+  const surveyText = buildNoteText();
   const driveUrl = document.getElementById('f-drive-url').value.trim();
+  const flags = getFlags();
 
   try {
-    // 1. Update deal stage + drive URL (if deal found)
+    // Update deal — write full survey into description, advance stage
     if (foundDealId) {
       const dealUpdate = {
         properties: {
-          dealstage: 'qualifiedtobuy', // maps to "Site Survey Complete" — adjust to your pipeline stage ID
-          ...(driveUrl && { description: `Drive: ${driveUrl}` }),
+          dealstage: 'qualifiedtobuy',
+          description: surveyText + (driveUrl ? `\n\nDRIVE FOLDER: ${driveUrl}` : ''),
         }
       };
       const updateRes = await fetch(`https://api.hubapi.com/crm/v3/objects/deals/${foundDealId}`, {
@@ -933,71 +932,36 @@ async function submitToHubSpot() {
       });
       if (!updateRes.ok) {
         const err = await updateRes.json();
-        console.warn('Deal update warning:', err.message);
-        // Non-fatal — continue with note
+        throw new Error(err.message || 'Deal update failed');
       }
-    }
-
-    // 2. Log full survey note
-    const noteBody = {
-      properties: { hs_note_body: noteText, hs_timestamp: Date.now().toString() },
-      associations: []
-    };
-    if (foundContactId) noteBody.associations.push({ to: { id: foundContactId }, types: [{ associationCategory: 'HUBSPOT_DEFINED', associationTypeId: 202 }] });
-    if (foundDealId) noteBody.associations.push({ to: { id: foundDealId }, types: [{ associationCategory: 'HUBSPOT_DEFINED', associationTypeId: 214 }] });
-
-    const noteRes = await fetch('https://api.hubapi.com/crm/v3/objects/notes', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
-      body: JSON.stringify(noteBody)
-    });
-    if (!noteRes.ok) {
-      const err = await noteRes.json();
-      throw new Error(err.message || 'Note creation failed');
-    }
-
-    // 3. Log a task for proposal follow-up
-    if (foundContactId) {
-      const taskBody = {
-        properties: {
-          hs_task_subject: `📐 Proposal due — ${foundDealName || 'Site Survey Complete'}`,
-          hs_task_body: `Site survey complete. Build proposal within 48 hours.`,
-          hs_timestamp: (Date.now() + 48 * 60 * 60 * 1000).toString(), // due in 48 hrs
-          hs_task_status: 'NOT_STARTED',
-          hs_task_type: 'TODO',
-        },
-        associations: [
-          { to: { id: foundContactId }, types: [{ associationCategory: 'HUBSPOT_DEFINED', associationTypeId: 204 }] },
-          ...(foundDealId ? [{ to: { id: foundDealId }, types: [{ associationCategory: 'HUBSPOT_DEFINED', associationTypeId: 216 }] }] : [])
-        ]
-      };
-      await fetch('https://api.hubapi.com/crm/v3/objects/tasks', {
-        method: 'POST',
+    } else if (foundContactId) {
+      // No deal — update contact with survey notes in about field
+      await fetch(`https://api.hubapi.com/crm/v3/objects/contacts/${foundContactId}`, {
+        method: 'PATCH',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
-        body: JSON.stringify(taskBody)
+        body: JSON.stringify({ properties: { hs_content_membership_notes: surveyText } })
       });
+    } else {
+      throw new Error('No contact or deal linked. Use the search above to find the customer first.');
     }
 
-    const flags = getFlags();
     showStatus('success',
-      `✓ Survey data pushed to HubSpot.<br>` +
-      `<br>` +
+      `✓ Survey data pushed to HubSpot.<br><br>` +
       `<strong>What was done:</strong><br>` +
-      `• Full survey note logged on ${foundDealId ? 'Deal + Contact' : 'Contact'}<br>` +
       `${foundDealId ? '• Deal stage advanced → Site Survey Complete<br>' : ''}` +
-      `${foundContactId ? '• Task created: Proposal due in 48 hours<br>' : ''}` +
-      `${flags.length > 0 ? `• ⚠ Active flags: ${flags.join(', ')}<br>` : ''}` +
-      `<br>Next: open HubSpot to set proposal amount and confirm deal stage.`
+      `• Full survey saved to Deal description<br>` +
+      `${driveUrl ? '• Drive folder URL saved<br>' : ''}` +
+      `${flags.length > 0 ? `• ⚠ Flags: ${flags.join(', ')}<br>` : ''}` +
+      `<br>Next: open HubSpot and build the proposal within 48 hours.`
     );
     btn.textContent = '✓ Done';
 
   } catch (err) {
-    showStatus('error', `❌ ${err.message}<br><small>Check API key scopes: contacts, deals, notes, tasks (write).</small>`);
+    showStatus('error', `❌ ${err.message}<br><small>Check API key scopes: contacts + deals read/write.</small>`);
     btn.disabled = false;
     btn.textContent = 'Retry';
   }
 }
-
 function buildNoteText() {
   const flags = getFlags();
   const photoDone = [...document.querySelectorAll('.photo-check')].filter(b => b.checked).length;

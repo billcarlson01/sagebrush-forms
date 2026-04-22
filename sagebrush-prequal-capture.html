@@ -653,7 +653,7 @@ async function submitToHubSpot() {
   const notes = buildNoteText();
 
   try {
-    // 1. Create / update Contact
+    // 1. Create Contact — only standard HubSpot properties
     const contactPayload = {
       properties: {
         firstname: firstName,
@@ -661,8 +661,6 @@ async function submitToHubSpot() {
         phone: phone,
         ...(email && { email }),
         address: address,
-        lead_source_detail: getVal('source'),
-        hs_lead_status: 'NEW',
       }
     };
 
@@ -672,29 +670,30 @@ async function submitToHubSpot() {
       body: JSON.stringify(contactPayload)
     });
 
+    let contactId;
+
     if (!contactRes.ok) {
       const err = await contactRes.json();
-      // If duplicate, search for existing
       if (err.category === 'CONFLICT') {
-        await handleExistingContact(phone, email, notes);
-        return;
+        // Duplicate — find existing contact by phone
+        contactId = await findContactByPhone(phone);
+        if (!contactId) throw new Error('Duplicate contact — could not find by phone. Check HubSpot manually.');
+      } else {
+        throw new Error(err.message || 'Contact creation failed');
       }
-      throw new Error(err.message || 'Contact creation failed');
+    } else {
+      const contact = await contactRes.json();
+      contactId = contact.id;
     }
 
-    const contact = await contactRes.json();
-    const contactId = contact.id;
-
-    // 2. Create Deal
+    // 2. Create Deal — write all call data into description field
     const dealName = `${firstName} ${lastName} — Solar — ${new Date().toLocaleDateString('en-US',{month:'short',year:'numeric'})}`;
     const dealPayload = {
       properties: {
         dealname: dealName,
         pipeline: 'default',
         dealstage: 'appointmentscheduled',
-        amount: '',
         description: notes,
-        lead_score: String(calcScore()),
       },
       associations: [{
         to: { id: contactId },
@@ -715,52 +714,29 @@ async function submitToHubSpot() {
 
     const deal = await dealRes.json();
 
-    // 3. Log note
-    await logNote(contactId, deal.id, notes);
-
-    showStatus('success', `✓ Contact <strong>${firstName} ${lastName}</strong> and Deal created in HubSpot. Deal ID: ${deal.id}.<br><br>Next: open HubSpot and set the Survey Date and Deal Amount in the Solar Ops Clean pipeline.`);
+    showStatus('success', `✓ Contact <strong>${firstName} ${lastName}</strong> and Deal created in HubSpot.<br><br>Deal: <strong>${dealName}</strong><br>All call data saved in Deal description.<br><br>Next: set the Deal Amount and confirm pipeline stage in HubSpot.`);
     btn.textContent = '✓ Done';
 
   } catch (err) {
-    showStatus('error', `❌ Error: ${err.message}<br><small>Check your API key and that your Private App has <code>contacts</code> and <code>crm.objects.deals</code> scopes.</small>`);
+    showStatus('error', `❌ ${err.message}<br><small>Verify your Private App has <code>crm.objects.contacts.write</code> and <code>crm.objects.deals.write</code> scopes.</small>`);
     btn.disabled = false;
     btn.textContent = 'Retry';
   }
 }
 
-async function handleExistingContact(phone, email, notes) {
-  // Search by phone
-  const searchRes = await fetch('https://api.hubapi.com/crm/v3/objects/contacts/search', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
-    body: JSON.stringify({ filterGroups: [{ filters: [{ propertyName: 'phone', operator: 'EQ', value: phone }] }], properties: ['firstname','lastname','id'] })
-  });
-  const searchData = await searchRes.json();
-  if (searchData.results && searchData.results.length > 0) {
-    const contactId = searchData.results[0].id;
-    const name = (searchData.results[0].properties.firstname || '') + ' ' + (searchData.results[0].properties.lastname || '');
-    showStatus('success', `✓ Existing contact found: <strong>${name.trim()}</strong> (ID: ${contactId}). Note logged. Check HubSpot to create a new Deal manually if needed.`);
-    await logNote(contactId, null, notes);
-    document.getElementById('hs-submit-btn').textContent = '✓ Done';
-  } else {
-    showStatus('error', '⚠ Contact appears to be a duplicate but could not be found by phone. Check HubSpot manually.');
-    document.getElementById('hs-submit-btn').disabled = false;
-    document.getElementById('hs-submit-btn').textContent = 'Retry';
-  }
-}
-
-async function logNote(contactId, dealId, noteText) {
-  const body = {
-    properties: { hs_note_body: noteText, hs_timestamp: Date.now().toString() },
-    associations: []
-  };
-  if (contactId) body.associations.push({ to: { id: contactId }, types: [{ associationCategory: 'HUBSPOT_DEFINED', associationTypeId: 202 }] });
-  if (dealId) body.associations.push({ to: { id: dealId }, types: [{ associationCategory: 'HUBSPOT_DEFINED', associationTypeId: 214 }] });
-  await fetch('https://api.hubapi.com/crm/v3/objects/notes', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
-    body: JSON.stringify(body)
-  });
+async function findContactByPhone(phone) {
+  try {
+    const res = await fetch('https://api.hubapi.com/crm/v3/objects/contacts/search', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+      body: JSON.stringify({
+        filterGroups: [{ filters: [{ propertyName: 'phone', operator: 'EQ', value: phone }] }],
+        properties: ['id'], limit: 1
+      })
+    });
+    const data = await res.json();
+    return data.results && data.results.length > 0 ? data.results[0].id : null;
+  } catch { return null; }
 }
 
 function buildNoteText() {
