@@ -27,17 +27,16 @@
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   body { background: var(--bg); font-family: 'IBM Plex Sans', sans-serif; color: var(--ink); min-height: 100vh; padding-bottom: 130px; }
 
-  /* ── HEADER ── */
   .app-header { background: var(--ink); padding: 14px 20px; position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; }
   .app-header h1 { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; color: #F5A623; letter-spacing: 0.05em; font-weight: 500; }
   .app-header span { font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; color: rgba(255,255,255,0.4); }
 
-  /* ── PROGRESS ── */
   .progress-bar { background: var(--border); height: 3px; position: sticky; top: 49px; z-index: 99; }
   .progress-fill { background: var(--sun); height: 100%; width: 0%; transition: width 0.3s ease; }
 
-  /* ── CONFIG BANNER ── */
-  .config-banner { margin: 14px 16px 0; background: var(--caution-light); border: 1px solid rgba(200,134,10,0.3); border-left: 4px solid var(--caution); border-radius: 6px; padding: 12px 16px; }
+  .pipeline-badge { margin: 14px 16px 0; background: var(--sage-light); border: 1px solid rgba(74,103,65,0.3); border-left: 4px solid var(--sage); border-radius: 6px; padding: 10px 16px; font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; color: var(--sage); }
+
+  .config-banner { margin: 10px 16px 0; background: var(--caution-light); border: 1px solid rgba(200,134,10,0.3); border-left: 4px solid var(--caution); border-radius: 6px; padding: 12px 16px; }
   .config-banner.connected { background: var(--success-light); border-color: rgba(46,125,50,0.3); border-left-color: var(--success); }
   .config-banner h3 { font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--caution); margin-bottom: 8px; }
   .config-banner.connected h3 { color: var(--success); }
@@ -48,7 +47,6 @@
   .config-note { font-size: 0.72rem; color: var(--caution); margin-top: 6px; line-height: 1.5; }
   .config-note.ok { color: var(--success); }
 
-  /* ── DEAL FINDER ── */
   .deal-finder { margin: 14px 16px 0; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
   .deal-finder-header { padding: 13px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
   .deal-finder-header .section-num { font-family: 'IBM Plex Mono', monospace; font-size: 0.62rem; font-weight: 600; color: white; background: var(--sage); width: 22px; height: 22px; border-radius: 4px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
@@ -59,7 +57,6 @@
   .search-row input:focus { border-color: var(--sun); background: white; }
   .btn-search { background: var(--ink); color: white; border: none; border-radius: 6px; padding: 10px 16px; font-family: 'IBM Plex Sans', sans-serif; font-size: 0.85rem; font-weight: 600; cursor: pointer; white-space: nowrap; }
   .btn-search:active { opacity: 0.8; }
-
   .deal-result { display: none; padding: 12px 14px; border-radius: 6px; font-size: 0.82rem; line-height: 1.6; }
   .deal-result.found { display: block; background: var(--success-light); border: 1px solid rgba(46,125,50,0.3); color: var(--success); }
   .deal-result.not-found { display: block; background: var(--danger-light); border: 1px solid rgba(192,57,43,0.2); color: var(--danger); }
@@ -72,19 +69,17 @@
   .drive-row input:focus { border-color: var(--sage); background: white; }
   .drive-note { font-size: 0.72rem; color: var(--sage); line-height: 1.5; }
 
-  /* ── SECTIONS ── */
   .section { margin: 14px 16px 0; background: var(--surface); border-radius: 8px; border: 1px solid var(--border); overflow: hidden; }
   .section-header { padding: 13px 16px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--border); }
   .section-num { font-family: 'IBM Plex Mono', monospace; font-size: 0.62rem; font-weight: 600; color: white; background: var(--sun); width: 22px; height: 22px; border-radius: 4px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
   .section-title { font-weight: 600; font-size: 0.88rem; color: var(--ink); flex: 1; }
 
-  /* ── FIELDS ── */
   .field { padding: 11px 16px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 6px; }
   .field:last-child { border-bottom: none; }
   .field label { font-size: 0.68rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.09em; font-family: 'IBM Plex Mono', monospace; }
   .field label .req { color: var(--sun); margin-left: 2px; }
 
-  input[type="text"], input[type="number"], input[type="tel"], select, textarea {
+  input[type="text"], input[type="number"], input[type="tel"], input[type="email"], input[type="url"], select, textarea {
     width: 100%; background: var(--bg); border: 1.5px solid var(--border); border-radius: 6px;
     padding: 10px 12px; font-family: 'IBM Plex Sans', sans-serif; font-size: 0.95rem; color: var(--ink);
     outline: none; transition: border-color 0.15s; -webkit-appearance: none; appearance: none;
@@ -96,14 +91,12 @@
     background-repeat: no-repeat; background-position: right 12px center; padding-right: 36px;
   }
 
-  /* ── PILLS ── */
   .pill-group { display: flex; flex-wrap: wrap; gap: 7px; }
   .pill-group input { display: none; }
   .pill-group label { display: inline-flex; align-items: center; padding: 7px 13px; border-radius: 20px; border: 1.5px solid var(--border); font-size: 0.82rem; color: var(--ink); cursor: pointer; transition: all 0.12s; font-family: 'IBM Plex Sans', sans-serif; background: var(--bg); }
   .pill-group input:checked + label { background: var(--sun); border-color: var(--sun); color: white; font-weight: 500; }
   .pill-group.sage input:checked + label { background: var(--sage); border-color: var(--sage); }
 
-  /* ── TOGGLES ── */
   .toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid var(--border); }
   .toggle-row:last-child { border-bottom: none; }
   .toggle-label { font-size: 0.88rem; color: var(--ink); flex: 1; }
@@ -115,7 +108,6 @@
   .toggle input:checked + .toggle-track { background: var(--sun); }
   .toggle input:checked + .toggle-track:before { transform: translateX(18px); }
 
-  /* ── FLAG ITEMS ── */
   .flag-list { padding: 4px 0; }
   .flag-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--border); cursor: pointer; }
   .flag-item:last-child { border-bottom: none; }
@@ -125,7 +117,6 @@
   .flag-text { font-size: 0.88rem; color: var(--ink); line-height: 1.4; }
   .flag-sub { font-size: 0.72rem; color: var(--muted); margin-top: 1px; }
 
-  /* ── PHOTO CHECK ── */
   .photo-check-item { display: flex; align-items: center; gap: 12px; padding: 11px 16px; border-bottom: 1px solid var(--border); cursor: pointer; }
   .photo-check-item:last-child { border-bottom: none; }
   .photo-check-item input[type="checkbox"] { width: 20px; height: 20px; border: 2px solid var(--border); border-radius: 4px; appearance: none; -webkit-appearance: none; flex-shrink: 0; cursor: pointer; transition: all 0.15s; background: var(--bg); position: relative; }
@@ -134,18 +125,18 @@
   .photo-label { font-size: 0.85rem; color: var(--ink); }
   .photo-counter { font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; color: var(--muted); padding: 10px 16px; background: var(--bg); border-top: 1px solid var(--border); }
 
-  /* ── FLAG WARNING ── */
   .flag-warn { display: none; margin: 0 16px 12px; background: var(--danger-light); border: 1px solid rgba(192,57,43,0.25); border-left: 4px solid var(--danger); border-radius: 6px; padding: 10px 14px; font-size: 0.8rem; color: var(--danger); line-height: 1.5; }
   .flag-warn.show { display: block; }
 
-  /* ── BOTTOM BAR ── */
+  .psps-warn { display: none; margin: 0 16px 0; background: var(--caution-light); border: 1px solid rgba(200,134,10,0.3); border-left: 4px solid var(--caution); border-radius: 6px; padding: 10px 14px; font-size: 0.8rem; color: var(--caution); line-height: 1.5; }
+  .psps-warn.show { display: block; }
+
   .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid var(--border); padding: 12px 16px; display: flex; gap: 10px; z-index: 100; box-shadow: 0 -4px 20px rgba(0,0,0,0.08); }
   .btn-secondary { flex: 1; padding: 13px; background: var(--bg); border: 1.5px solid var(--border); border-radius: 8px; font-family: 'IBM Plex Sans', sans-serif; font-size: 0.85rem; font-weight: 500; color: var(--muted); cursor: pointer; }
   .btn-primary { flex: 2.5; padding: 13px; background: var(--sun); border: none; border-radius: 8px; font-family: 'IBM Plex Sans', sans-serif; font-size: 0.9rem; font-weight: 600; color: white; cursor: pointer; }
   .btn-primary:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; }
   .btn-primary:active:not(:disabled) { background: var(--sun-dark); }
 
-  /* ── MODAL ── */
   .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.65); z-index: 200; padding: 20px; overflow-y: auto; align-items: flex-start; justify-content: center; padding-top: 30px; }
   .modal-overlay.show { display: flex; }
   .modal { background: white; border-radius: 12px; width: 100%; max-width: 480px; overflow: hidden; }
@@ -164,17 +155,15 @@
   .submit-status.error { background: var(--danger-light); color: var(--danger); }
 
   code { font-family: 'IBM Plex Mono', monospace; background: rgba(0,0,0,0.07); padding: 2px 5px; border-radius: 3px; font-size: 0.8em; }
-
   .spacer { height: 14px; }
 
-  /* ── CREATE FALLBACK ── */
   .create-fallback { display: none; background: var(--caution-light); border: 1px solid rgba(200,134,10,0.3); border-radius: 6px; padding: 14px 16px; }
   .create-fallback.show { display: block; }
   .create-fallback h4 { font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--caution); margin-bottom: 10px; }
   .create-fallback .field-mini { display: flex; flex-direction: column; gap: 5px; margin-bottom: 10px; }
   .create-fallback .field-mini label { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
-  .create-fallback .field-mini input { background: white; border: 1.5px solid var(--border); border-radius: 6px; padding: 9px 12px; font-family: 'IBM Plex Sans', sans-serif; font-size: 0.9rem; color: var(--ink); outline: none; width: 100%; }
-  .create-fallback .field-mini input:focus { border-color: var(--caution); }
+  .create-fallback .field-mini input, .create-fallback .field-mini select { background: white; border: 1.5px solid var(--border); border-radius: 6px; padding: 9px 12px; font-family: 'IBM Plex Sans', sans-serif; font-size: 0.9rem; color: var(--ink); outline: none; width: 100%; }
+  .create-fallback .field-mini input:focus, .create-fallback .field-mini select:focus { border-color: var(--caution); }
   .create-fallback .field-row { display: flex; gap: 8px; }
   .create-fallback .field-row .field-mini { flex: 1; }
   .btn-create { width: 100%; background: var(--caution); color: white; border: none; border-radius: 6px; padding: 11px; font-family: 'IBM Plex Sans', sans-serif; font-size: 0.88rem; font-weight: 600; cursor: pointer; margin-top: 4px; }
@@ -184,6 +173,14 @@
   .create-status.show { display: block; }
   .create-status.success { background: var(--success-light); color: var(--success); border: 1px solid rgba(46,125,50,0.3); }
   .create-status.error { background: var(--danger-light); color: var(--danger); border: 1px solid rgba(192,57,43,0.2); }
+
+  /* Battery qty reveal */
+  .batt-qty-row { display: none; padding: 11px 16px; border-top: 1px solid var(--border); flex-direction: column; gap: 6px; }
+  .batt-qty-row.show { display: flex; }
+
+  /* EV detail reveal */
+  .ev-detail-row { display: none; padding: 11px 16px; border-top: 1px solid var(--border); flex-direction: column; gap: 6px; }
+  .ev-detail-row.show { display: flex; }
 </style>
 </head>
 <body>
@@ -193,6 +190,9 @@
   <span id="date-display"></span>
 </div>
 <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+<!-- PIPELINE BADGE -->
+<div class="pipeline-badge">⚡ Solar PV · Solar Ops – Clean Pipeline</div>
 
 <!-- API CONFIG -->
 <div class="config-banner" id="config-banner">
@@ -214,20 +214,19 @@
   </div>
   <div class="deal-finder-body">
     <div class="search-row">
-      <input type="text" id="search-input" placeholder="Last name or phone — e.g. Davis or 775-327" onkeydown="if(event.key==='Enter') searchDeal()">
+      <input type="text" id="search-input" placeholder="Last name or phone — e.g. Leck or 775-376" onkeydown="if(event.key==='Enter') searchDeal()">
       <button class="btn-search" onclick="searchDeal()">Search</button>
     </div>
     <div class="deal-result" id="deal-result"></div>
 
-    <!-- FALLBACK: CREATE NEW CONTACT + DEAL -->
     <div class="create-fallback" id="create-fallback">
       <h4>⚡ No record found — create new Contact + Deal</h4>
       <div class="field-row">
-        <div class="field-mini"><label>First Name *</label><input type="text" id="new-first" placeholder="Leslie"></div>
-        <div class="field-mini"><label>Last Name *</label><input type="text" id="new-last" placeholder="Davis"></div>
+        <div class="field-mini"><label>First Name *</label><input type="text" id="new-first" placeholder="Christy"></div>
+        <div class="field-mini"><label>Last Name *</label><input type="text" id="new-last" placeholder="Leck"></div>
       </div>
-      <div class="field-mini"><label>Phone *</label><input type="tel" id="new-phone" placeholder="775-327-4663"></div>
-      <div class="field-mini"><label>Email</label><input type="email" id="new-email" placeholder="leslie@email.com"></div>
+      <div class="field-mini"><label>Phone *</label><input type="tel" id="new-phone" placeholder="775-376-0116"></div>
+      <div class="field-mini"><label>Email</label><input type="email" id="new-email" placeholder="christy@email.com"></div>
       <div class="field-mini"><label>Lead Source</label>
         <select id="new-source">
           <option value="Website Form">Website Form</option>
@@ -243,8 +242,14 @@
 
     <div class="drive-row">
       <label>📁 Google Drive Folder URL</label>
-      <input type="text" id="f-drive-url" placeholder="https://drive.google.com/drive/folders/...">
-      <div class="drive-note">Paste Drive folder URL here — it will be saved to the HubSpot deal. Folder name: <code>WASHOE-[YR]-[LastName]-[Address]</code></div>
+      <input type="url" id="f-drive-url" placeholder="https://drive.google.com/drive/folders/...">
+      <div class="drive-note">Folder name: <code>AHJ-YR-LastName-Address</code> (e.g. <code>RENO-2026-Leck-20217SVirginiaS</code>)</div>
+    </div>
+
+    <div class="drive-row">
+      <label>🌐 WebODM Task URL</label>
+      <input type="url" id="f-webodm-url" placeholder="https://cloud2.webodm.net/dashboard/#/...">
+      <div class="drive-note">Paste the WebODM Lightning task link once processing is complete.</div>
     </div>
   </div>
 </div>
@@ -255,12 +260,12 @@
     <div class="section-num">1</div>
     <span class="section-title">Property & Ownership</span>
   </div>
-  <div class="field"><label>Street Address <span class="req">*</span></label><input type="text" id="f-address" placeholder="123 Sun Valley Dr, Reno NV 89502" oninput="updateProgress()"></div>
+  <div class="field"><label>Street Address <span class="req">*</span></label><input type="text" id="f-address" placeholder="20217 S Virginia St, Reno NV 89511" oninput="updateProgress()"></div>
   <div class="field">
     <label>Homeowner Confirmed <span class="req">*</span></label>
     <div class="pill-group">
-      <input type="radio" name="owner" id="own-yes" value="Yes — Owner" onchange="updateProgress()"><label for="own-yes">✓ Owner</label>
-      <input type="radio" name="owner" id="own-trust" value="Trust / LLC" onchange="updateProgress()"><label for="own-trust">Trust / LLC</label>
+      <input type="radio" name="owner" id="own-yes" value="Yes — Owner" onchange="updateProgress(); checkOwner()"><label for="own-yes">✓ Owner</label>
+      <input type="radio" name="owner" id="own-trust" value="Trust / LLC" onchange="updateProgress(); checkOwner()"><label for="own-trust">Trust / LLC</label>
       <input type="radio" name="owner" id="own-no" value="Renter — STOP" onchange="updateProgress(); checkOwner()"><label for="own-no">✗ Renter</label>
     </div>
   </div>
@@ -282,6 +287,15 @@
       <input type="radio" name="ahj" id="ahj-other" value="Other"><label for="ahj-other">Other</label>
     </div>
   </div>
+  <div class="field">
+    <label>Utility</label>
+    <div class="pill-group">
+      <input type="radio" name="utility" id="ut-nve" value="NV Energy" onchange="checkUtility()"><label for="ut-nve">NV Energy</label>
+      <input type="radio" name="utility" id="ut-nve-psps" value="NV Energy — PSPS Area" onchange="checkUtility()"><label for="ut-nve-psps">NV Energy — PSPS Area ⚡</label>
+      <input type="radio" name="utility" id="ut-other" value="Other" onchange="checkUtility()"><label for="ut-other">Other</label>
+    </div>
+  </div>
+  <div class="psps-warn show" id="warn-psps" style="display:none; margin: 0 0 0; border-radius:0; border-left:0; border-right:0; border-top:0;">⚡ PSPS area — battery backup is primary value proposition. Size for overnight outage coverage minimum (2× IQ Battery 5P recommended).</div>
 </div>
 
 <!-- SECTION 2: ROOF -->
@@ -324,8 +338,9 @@
     <label>Primary Array Azimuth</label>
     <div class="pill-group">
       <input type="radio" name="azimuth" id="az-s" value="South"><label for="az-s">South ★</label>
-      <input type="radio" name="azimuth" id="az-sw" value="SW"><label for="az-sw">SW</label>
-      <input type="radio" name="azimuth" id="az-se" value="SE"><label for="az-se">SE</label>
+      <input type="radio" name="azimuth" id="az-sw" value="South + West"><label for="az-sw">S + West</label>
+      <input type="radio" name="azimuth" id="az-se" value="South + East"><label for="az-se">S + East</label>
+      <input type="radio" name="azimuth" id="az-ew" value="East / West Split"><label for="az-ew">E / W Split</label>
       <input type="radio" name="azimuth" id="az-w" value="West"><label for="az-w">West</label>
       <input type="radio" name="azimuth" id="az-e" value="East"><label for="az-e">East</label>
       <input type="radio" name="azimuth" id="az-n" value="North ⚠" onchange="checkAzimuth()"><label for="az-n">North ⚠</label>
@@ -334,20 +349,7 @@
   <div class="flag-warn" id="warn-azimuth">⚠ North-facing — very low production. Discuss with customer before proceeding.</div>
   <div class="field">
     <label>Approx Usable Area (sq ft)</label>
-    <input type="number" id="f-roofarea" placeholder="e.g. 600" oninput="updateProgress()">
-  </div>
-  <div class="field">
-    <label>Shading</label>
-    <div class="pill-group">
-      <input type="radio" name="shade" id="sh-none" value="None"><label for="sh-none">None</label>
-      <input type="radio" name="shade" id="sh-min" value="Minimal"><label for="sh-min">Minimal</label>
-      <input type="radio" name="shade" id="sh-mod" value="Moderate"><label for="sh-mod">Moderate ⚠</label>
-      <input type="radio" name="shade" id="sh-heavy" value="Heavy"><label for="sh-heavy">Heavy ⚠</label>
-    </div>
-  </div>
-  <div class="field">
-    <label>Shading Source / Notes</label>
-    <textarea id="f-shadenotes" placeholder="Trees to SW, neighbor chimney, HVAC units..."></textarea>
+    <input type="number" id="f-roofarea" placeholder="e.g. 600">
   </div>
   <div class="field">
     <label>Roof Pitch (approx)</label>
@@ -357,6 +359,23 @@
       <input type="radio" name="pitch" id="pt-med" value="Medium (5–8/12)"><label for="pt-med">Medium</label>
       <input type="radio" name="pitch" id="pt-steep" value="Steep (9+/12)"><label for="pt-steep">Steep ⚠</label>
     </div>
+  </div>
+  <div class="field">
+    <label>Shading</label>
+    <div class="pill-group">
+      <input type="radio" name="shade" id="sh-none" value="None"><label for="sh-none">None</label>
+      <input type="radio" name="shade" id="sh-min" value="Minimal"><label for="sh-min">Minimal</label>
+      <input type="radio" name="shade" id="sh-mod" value="Moderate ⚠"><label for="sh-mod">Moderate ⚠</label>
+      <input type="radio" name="shade" id="sh-heavy" value="Heavy ⚠"><label for="sh-heavy">Heavy ⚠</label>
+    </div>
+  </div>
+  <div class="field">
+    <label>Shading Source / Notes</label>
+    <textarea id="f-shadenotes" placeholder="Trees to SW, neighbor chimney, HVAC units..."></textarea>
+  </div>
+  <div class="field">
+    <label>Est. System Size (kW)</label>
+    <input type="number" id="f-systemkw" placeholder="e.g. 9.5" step="0.1">
   </div>
 </div>
 
@@ -378,6 +397,15 @@
   </div>
   <div class="flag-warn" id="warn-panel-amps">⚠ 100A panel — upgrade likely required. Add to proposal as line item.</div>
   <div class="field">
+    <label>MPU / Panel Upgrade Status</label>
+    <div class="pill-group">
+      <input type="radio" name="mpu" id="mpu-no" value="No upgrade needed"><label for="mpu-no">Not needed</label>
+      <input type="radio" name="mpu" id="mpu-planned" value="MPU in progress — permit pulled"><label for="mpu-planned">MPU in progress ⚡</label>
+      <input type="radio" name="mpu" id="mpu-needed" value="MPU needed — quote separately"><label for="mpu-needed">MPU needed</label>
+      <input type="radio" name="mpu" id="mpu-tbd" value="TBD"><label for="mpu-tbd">TBD</label>
+    </div>
+  </div>
+  <div class="field">
     <label>Panel Brand</label>
     <div class="pill-group">
       <input type="radio" name="panelbrand" id="pb-sq" value="Square D"><label for="pb-sq">Square D</label>
@@ -393,14 +421,6 @@
   <div class="field">
     <label>Available Breaker Slots</label>
     <input type="number" id="f-slots" placeholder="e.g. 4">
-  </div>
-  <div class="field">
-    <label>Panel Upgrade Needed?</label>
-    <div class="pill-group">
-      <input type="radio" name="panelupgrade" id="pu-no" value="No"><label for="pu-no">No</label>
-      <input type="radio" name="panelupgrade" id="pu-yes" value="Yes — quote separately"><label for="pu-yes">Yes — quote separately</label>
-      <input type="radio" name="panelupgrade" id="pu-tbd" value="TBD"><label for="pu-tbd">TBD</label>
-    </div>
   </div>
   <div class="field">
     <label>Meter Location</label>
@@ -437,20 +457,44 @@
   </div>
   <label class="toggle-row">
     <div><div class="toggle-label">Tesla Powerwall</div><div class="toggle-sub">Confirm load center / gateway space</div></div>
-    <div class="toggle"><input type="checkbox" id="t-powerwall"><div class="toggle-track"></div></div>
+    <div class="toggle"><input type="checkbox" id="t-powerwall" onchange="toggleBattQty('powerwall')"><div class="toggle-track"></div></div>
   </label>
   <label class="toggle-row">
     <div><div class="toggle-label">Enphase IQ Battery</div><div class="toggle-sub">Check phase compatibility</div></div>
-    <div class="toggle"><input type="checkbox" id="t-enphase-batt"><div class="toggle-track"></div></div>
+    <div class="toggle"><input type="checkbox" id="t-enphase-batt" onchange="toggleBattQty('enphase')"><div class="toggle-track"></div></div>
   </label>
+
+  <!-- Battery quantity — shown when either battery toggle is on -->
+  <div class="batt-qty-row" id="batt-qty-row">
+    <label class="field" style="padding:0; border:none;">
+      <span style="font-size:0.68rem; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:0.09em; font-family:'IBM Plex Mono',monospace;">Battery Quantity</span>
+    </label>
+    <div class="pill-group" style="padding: 0 0 4px;">
+      <input type="radio" name="battqty" id="bq-1" value="1"><label for="bq-1">1</label>
+      <input type="radio" name="battqty" id="bq-2" value="2"><label for="bq-2">2</label>
+      <input type="radio" name="battqty" id="bq-3" value="3"><label for="bq-3">3</label>
+      <input type="radio" name="battqty" id="bq-4plus" value="4+"><label for="bq-4plus">4+</label>
+      <input type="radio" name="battqty" id="bq-tbd" value="TBD"><label for="bq-tbd">TBD</label>
+    </div>
+  </div>
+
   <label class="toggle-row">
-    <div><div class="toggle-label">EV Charger (Level 2 EVSE)</div><div class="toggle-sub">240V circuit — note location preference</div></div>
-    <div class="toggle"><input type="checkbox" id="t-ev"><div class="toggle-track"></div></div>
-  </label>
-  <label class="toggle-row">
-    <div><div class="toggle-label">Whole-Home Backup Required</div><div class="toggle-sub">Drives Powerwall qty + transfer switch</div></div>
+    <div><div class="toggle-label">Whole-Home Backup Required</div><div class="toggle-sub">Drives battery qty + transfer switch</div></div>
     <div class="toggle"><input type="checkbox" id="t-backup"><div class="toggle-track"></div></div>
   </label>
+  <label class="toggle-row">
+    <div><div class="toggle-label">EV Charger (Level 2 EVSE)</div><div class="toggle-sub">240V circuit — note location + EV details below</div></div>
+    <div class="toggle"><input type="checkbox" id="t-ev" onchange="toggleEvDetail()"><div class="toggle-track"></div></div>
+  </label>
+
+  <!-- EV detail — shown when EV toggle is on -->
+  <div class="ev-detail-row" id="ev-detail-row">
+    <label style="font-size:0.68rem; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:0.09em; font-family:'IBM Plex Mono',monospace;">EV Make / Model</label>
+    <input type="text" id="f-ev-model" placeholder="e.g. Tesla Model Y, Chevy Bolt, Ford F-150 Lightning">
+    <label style="font-size:0.68rem; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:0.09em; font-family:'IBM Plex Mono',monospace; margin-top:8px;">Preferred EVSE Location</label>
+    <input type="text" id="f-ev-location" placeholder="e.g. Garage left wall, driveway exterior">
+  </div>
+
   <div class="field">
     <label>Battery / Gateway Location</label>
     <div class="pill-group">
@@ -462,31 +506,89 @@
   </div>
 </div>
 
-<!-- SECTION 5: FLAGS -->
+<!-- SECTION 5: CUSTOMER PROFILE -->
 <div class="section">
   <div class="section-header">
     <div class="section-num">5</div>
+    <span class="section-title">Customer Profile</span>
+  </div>
+  <div class="field">
+    <label>Primary Motivation</label>
+    <div class="pill-group sage">
+      <input type="radio" name="motivation" id="mot-bill" value="Bill reduction / rate hedge"><label for="mot-bill">Bill savings</label>
+      <input type="radio" name="motivation" id="mot-batt" value="Battery backup / outage resilience"><label for="mot-batt">Backup power ⚡</label>
+      <input type="radio" name="motivation" id="mot-env" value="Environmental / sustainability"><label for="mot-env">Sustainability</label>
+      <input type="radio" name="motivation" id="mot-ev" value="EV charging offset"><label for="mot-ev">EV offset</label>
+      <input type="radio" name="motivation" id="mot-val" value="Home value / resale"><label for="mot-val">Home value</label>
+    </div>
+  </div>
+  <div class="field">
+    <label>Finance Preference</label>
+    <div class="pill-group sage">
+      <input type="radio" name="finance" id="fin-cash" value="Cash"><label for="fin-cash">Cash</label>
+      <input type="radio" name="finance" id="fin-loan" value="Loan — Mosaic / GoodLeap"><label for="fin-loan">Loan</label>
+      <input type="radio" name="finance" id="fin-lease" value="Lease / PPA"><label for="fin-lease">Lease / PPA</label>
+      <input type="radio" name="finance" id="fin-unsure" value="Unsure — present options"><label for="fin-unsure">Unsure</label>
+    </div>
+  </div>
+  <div class="field">
+    <label>Utility Bill History Available?</label>
+    <div class="pill-group">
+      <input type="radio" name="billhist" id="bh-yes" value="Yes — customer provided"><label for="bh-yes">Yes</label>
+      <input type="radio" name="billhist" id="bh-new" value="No — recently moved in"><label for="bh-new">Recently moved in</label>
+      <input type="radio" name="billhist" id="bh-no" value="No — will follow up"><label for="bh-no">No — follow up</label>
+    </div>
+  </div>
+  <div class="field">
+    <label>Avg Monthly Usage (kWh) — if known</label>
+    <input type="number" id="f-kwh" placeholder="e.g. 1150">
+  </div>
+  <div class="field">
+    <label>Decision Timeline</label>
+    <div class="pill-group sage">
+      <input type="radio" name="timeline" id="tl-now" value="Ready now"><label for="tl-now">Ready now</label>
+      <input type="radio" name="timeline" id="tl-30" value="1–3 months"><label for="tl-30">1–3 months</label>
+      <input type="radio" name="timeline" id="tl-90" value="3–6 months"><label for="tl-90">3–6 months</label>
+      <input type="radio" name="timeline" id="tl-future" value="Just exploring"><label for="tl-future">Just exploring</label>
+    </div>
+  </div>
+  <div class="field">
+    <label>Number of Decision Makers</label>
+    <div class="pill-group">
+      <input type="radio" name="dm" id="dm-1" value="1 — sole decision maker"><label for="dm-1">Just me</label>
+      <input type="radio" name="dm" id="dm-2" value="2 — spouse / partner involved"><label for="dm-2">Spouse / partner</label>
+      <input type="radio" name="dm" id="dm-other" value="Other"><label for="dm-other">Other</label>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 6: FLAGS -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">6</div>
     <span class="section-title">Flags & Issues</span>
   </div>
   <div class="flag-list">
     <label class="flag-item"><input type="checkbox" id="flag-struct"><div><div class="flag-text">Structural concern — rafter spacing, rot, sag</div><div class="flag-sub">May require engineer sign-off</div></div></label>
     <label class="flag-item"><input type="checkbox" id="flag-roof-replace"><div><div class="flag-text">Roof replacement recommended before install</div></div></label>
     <label class="flag-item"><input type="checkbox" id="flag-panel-upgrade"><div><div class="flag-text">Panel upgrade required</div><div class="flag-sub">Add to proposal as separate line item</div></div></label>
+    <label class="flag-item"><input type="checkbox" id="flag-mpu-coord"><div><div class="flag-text">MPU in progress — coordinate install timing</div><div class="flag-sub">Do not pull solar permit until MPU closes</div></div></label>
     <label class="flag-item"><input type="checkbox" id="flag-hoa"><div><div class="flag-text">HOA approval pending — hold permit submission</div></div></label>
     <label class="flag-item"><input type="checkbox" id="flag-trees"><div><div class="flag-text">Tree trimming needed — customer to arrange</div></div></label>
     <label class="flag-item"><input type="checkbox" id="flag-asbestos"><div><div class="flag-text">Possible asbestos / hazmat — pre-1980 tile</div><div class="flag-sub">Do not proceed without abatement clearance</div></div></label>
+    <label class="flag-item"><input type="checkbox" id="flag-psps"><div><div class="flag-text">PSPS / outage-prone area — battery priority</div><div class="flag-sub">Size for overnight coverage minimum</div></div></label>
     <label class="flag-item"><input type="checkbox" id="flag-other"><div><div class="flag-text">Other flag — see notes</div></div></label>
   </div>
   <div class="field" style="border-top: 1px solid var(--border);">
     <label>Notes & Observations</label>
-    <textarea id="f-notes" placeholder="Gate code, dogs, customer comments, structural observations, access issues..."></textarea>
+    <textarea id="f-notes" placeholder="Gate code, dogs, customer comments, structural observations, access issues, upsell opportunities..."></textarea>
   </div>
 </div>
 
-<!-- SECTION 6: PHOTO CHECKLIST -->
+<!-- SECTION 7: PHOTO CHECKLIST -->
 <div class="section">
   <div class="section-header">
-    <div class="section-num">6</div>
+    <div class="section-num">7</div>
     <span class="section-title">Photo Checklist</span>
   </div>
   <label class="photo-check-item"><input type="checkbox" class="photo-check" onchange="updatePhotoCount()"><span class="photo-label">All roof planes — wide shot</span></label>
@@ -494,12 +596,14 @@
   <label class="photo-check-item"><input type="checkbox" class="photo-check" onchange="updatePhotoCount()"><span class="photo-label">Main electrical panel — open, showing breakers</span></label>
   <label class="photo-check-item"><input type="checkbox" class="photo-check" onchange="updatePhotoCount()"><span class="photo-label">Utility meter</span></label>
   <label class="photo-check-item"><input type="checkbox" class="photo-check" onchange="updatePhotoCount()"><span class="photo-label">Attic access + rafter framing</span></label>
-  <label class="photo-check-item"><input type="checkbox" class="photo-check" onchange="updatePhotoCount()"><span class="photo-label">Proposed inverter / gateway location</span></label>
+  <label class="photo-check-item"><input type="checkbox" class="photo-check" onchange="updatePhotoCount()"><span class="photo-label">Proposed inverter / gateway / battery location</span></label>
   <label class="photo-check-item"><input type="checkbox" class="photo-check" onchange="updatePhotoCount()"><span class="photo-label">Shading obstructions — trees, chimneys, vents</span></label>
   <label class="photo-check-item"><input type="checkbox" class="photo-check" onchange="updatePhotoCount()"><span class="photo-label">Front of home (for permit application)</span></label>
-  <div class="photo-counter" id="photo-counter">0 / 8 photos checked</div>
+  <label class="photo-check-item"><input type="checkbox" class="photo-check" onchange="updatePhotoCount()"><span class="photo-label">🚁 Drone survey flight completed — photos uploaded to Drive → 01-SiteSurvey</span></label>
+  <label class="photo-check-item"><input type="checkbox" class="photo-check" onchange="updatePhotoCount()"><span class="photo-label">🌐 WebODM task launched (link saved above)</span></label>
+  <div class="photo-counter" id="photo-counter">0 / 10 items checked</div>
   <div class="field" style="border-top: 1px solid var(--border);">
-    <label style="color: var(--sage);">📁 Upload photos to Drive → 01-SiteSurvey before leaving the property</label>
+    <label style="color: var(--sage);">📁 Upload all photos to Drive → 01-SiteSurvey before leaving the property</label>
   </div>
 </div>
 
@@ -527,6 +631,10 @@
 </div>
 
 <script>
+// ── PIPELINE ID — Solar Ops Clean (hardcoded, solar PV only) ──
+const SOLAR_OPS_PIPELINE_ID = '123809571';
+const SOLAR_OPS_STAGE_SURVEY = '1346916902'; // Site Survey
+
 // ── DATE ──
 document.getElementById('date-display').textContent = new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
 
@@ -566,7 +674,6 @@ function showConnected() {
   note.className = 'config-note ok';
 }
 
-// ── WORKER URL — same as pre-qual form ──
 const WORKER_URL = 'https://sagebrush-hubspot.bill-6c3.workers.dev';
 
 // ── DEAL SEARCH ──
@@ -619,7 +726,7 @@ async function searchDeal() {
 
     if (!dealsData.results || dealsData.results.length === 0) {
       result.className = 'deal-result not-found';
-      result.innerHTML = `⚠ Contact <strong>${contactName}</strong> found (ID: ${contact.id}) but has no deals.`;
+      result.innerHTML = `⚠ Contact <strong>${contactName}</strong> found but has no deals.`;
       document.getElementById('new-first').value = contact.properties.firstname || '';
       document.getElementById('new-last').value = contact.properties.lastname || '';
       document.getElementById('new-phone').value = contact.properties.phone || '';
@@ -651,7 +758,7 @@ async function searchDeal() {
   }
 }
 
-// ── CREATE FALLBACK: NEW CONTACT + DEAL ──
+// ── CREATE NEW CONTACT + DEAL (Solar Ops Clean pipeline) ──
 async function createContactAndDeal() {
   const firstName = document.getElementById('new-first').value.trim();
   const lastName  = document.getElementById('new-last').value.trim();
@@ -683,7 +790,8 @@ async function createContactAndDeal() {
         ...(email && { email }),
         notes: `Created from Site Survey — source: ${source}`,
         dealName,
-        // If contact already exists, Worker will handle duplicate gracefully
+        pipeline: SOLAR_OPS_PIPELINE_ID,
+        dealstage: SOLAR_OPS_STAGE_SURVEY,
       })
     });
 
@@ -696,10 +804,10 @@ async function createContactAndDeal() {
 
     const result = document.getElementById('deal-result');
     result.className = 'deal-result found';
-    result.innerHTML = `<strong>✓ ${firstName} ${lastName} — ${dealName}</strong><div class="deal-meta">Newly created · Deal ID: ${foundDealId} · Contact ID: ${foundContactId}</div>`;
+    result.innerHTML = `<strong>✓ ${firstName} ${lastName} — ${dealName}</strong><div class="deal-meta">Solar Ops Clean · Site Survey · Deal ID: ${foundDealId}</div>`;
 
     status.className = 'create-status show success';
-    status.innerHTML = `✓ Contact + Deal created. Survey will attach to this deal when you submit.`;
+    status.innerHTML = `✓ Contact + Deal created in Solar Ops – Clean pipeline.`;
     btn.textContent = '✓ Created';
     document.getElementById('create-fallback').style.borderColor = 'rgba(46,125,50,0.4)';
     updateProgress();
@@ -712,14 +820,13 @@ async function createContactAndDeal() {
   }
 }
 
-// ── CONDITIONAL WARNINGS ──
+// ── CONDITIONAL LOGIC ──
 function checkOwner() {
   const v = document.querySelector('input[name="owner"]:checked');
   document.getElementById('warn-renter').classList.toggle('show', v && v.value.includes('Renter'));
 }
 function checkRoofAge() {
-  const v = document.querySelector('input[name="roofage"]:checked');
-  document.getElementById('warn-roofage').classList.toggle('show', v && v.value.includes('20+'));
+  document.getElementById('warn-roofage').classList.toggle('show', true);
 }
 function checkRoofCond() {
   const v = document.querySelector('input[name="roofcond"]:checked');
@@ -737,19 +844,41 @@ function checkPanelBrand() {
   const v = document.querySelector('input[name="panelbrand"]:checked');
   document.getElementById('warn-panel-brand').classList.toggle('show', v && (v.value.includes('FPE') || v.value.includes('Zinsco')));
 }
+function checkUtility() {
+  const v = document.querySelector('input[name="utility"]:checked');
+  const warn = document.getElementById('warn-psps');
+  const show = v && v.value.includes('PSPS');
+  warn.style.display = show ? 'block' : 'none';
+  // also auto-check the PSPS flag
+  if (show) document.getElementById('flag-psps').checked = true;
+}
+function toggleBattQty(type) {
+  const pw = document.getElementById('t-powerwall').checked;
+  const en = document.getElementById('t-enphase-batt').checked;
+  document.getElementById('batt-qty-row').classList.toggle('show', pw || en);
+}
+function toggleEvDetail() {
+  const on = document.getElementById('t-ev').checked;
+  document.getElementById('ev-detail-row').classList.toggle('show', on);
+}
 
-// Wire up all warning triggers
+// Wire up warnings
 document.querySelectorAll('input[name="owner"]').forEach(e => e.addEventListener('change', checkOwner));
-document.querySelectorAll('input[name="roofage"]').forEach(e => e.addEventListener('change', checkRoofAge));
+document.querySelectorAll('input[name="roofage"]').forEach(e => e.addEventListener('change', () => {
+  const v = document.querySelector('input[name="roofage"]:checked');
+  document.getElementById('warn-roofage').classList.toggle('show', v && v.value.includes('20+'));
+}));
 document.querySelectorAll('input[name="roofcond"]').forEach(e => e.addEventListener('change', checkRoofCond));
 document.querySelectorAll('input[name="azimuth"]').forEach(e => e.addEventListener('change', checkAzimuth));
 document.querySelectorAll('input[name="amps"]').forEach(e => e.addEventListener('change', checkPanel));
 document.querySelectorAll('input[name="panelbrand"]').forEach(e => e.addEventListener('change', checkPanelBrand));
+document.querySelectorAll('input[name="utility"]').forEach(e => e.addEventListener('change', checkUtility));
 
 // ── PHOTO COUNTER ──
+const TOTAL_PHOTOS = 10;
 function updatePhotoCount() {
   const done = [...document.querySelectorAll('.photo-check')].filter(b => b.checked).length;
-  document.getElementById('photo-counter').textContent = `${done} / 8 photos checked`;
+  document.getElementById('photo-counter').textContent = `${done} / ${TOTAL_PHOTOS} items checked`;
   updateProgress();
 }
 
@@ -768,63 +897,78 @@ function updateProgress() {
 // ── HELPERS ──
 function getRadio(name) { const el = document.querySelector(`input[name="${name}"]:checked`); return el ? el.value : '—'; }
 function getToggle(id) { return document.getElementById(id).checked ? 'Yes' : 'No'; }
+function getVal(id) { const el = document.getElementById(id); return el && el.value ? el.value : '—'; }
 function getFlags() {
   const map = {
     'flag-struct': 'Structural concern',
     'flag-roof-replace': 'Roof replacement needed',
     'flag-panel-upgrade': 'Panel upgrade required',
+    'flag-mpu-coord': 'MPU in progress — coordinate timing',
     'flag-hoa': 'HOA approval pending',
     'flag-trees': 'Tree trimming needed',
     'flag-asbestos': 'Possible asbestos/hazmat',
+    'flag-psps': 'PSPS/outage area — battery priority',
     'flag-other': 'Other (see notes)'
   };
   return Object.entries(map).filter(([id]) => document.getElementById(id).checked).map(([,v]) => v);
-}
-function getPhotoCount() {
-  const done = [...document.querySelectorAll('.photo-check')].filter(b => b.checked).length;
-  return `${done}/8`;
 }
 
 // ── MODAL ──
 function showModal() {
   const flags = getFlags();
+  const evOn = document.getElementById('t-ev').checked;
+  const battOn = document.getElementById('t-powerwall').checked || document.getElementById('t-enphase-batt').checked;
+
   const rows = [
     ['DEAL', null],
-    ['HubSpot Deal', foundDealName || '⚠ No deal linked — will attach to contact only'],
-    ['Drive Folder', document.getElementById('f-drive-url').value || '— not entered'],
+    ['HubSpot Deal', foundDealName || '⚠ No deal linked'],
+    ['Pipeline', 'Solar Ops – Clean'],
+    ['Drive Folder', getVal('f-drive-url')],
+    ['WebODM Task', getVal('f-webodm-url')],
     ['PROPERTY', null],
-    ['Address', document.getElementById('f-address').value || '—'],
+    ['Address', getVal('f-address')],
     ['Ownership', getRadio('owner')],
     ['HOA', getRadio('hoa')],
     ['AHJ', getRadio('ahj')],
+    ['Utility', getRadio('utility')],
     ['ROOF', null],
     ['Material', getRadio('roofmat')],
     ['Age', getRadio('roofage')],
     ['Condition', getRadio('roofcond')],
     ['Azimuth', getRadio('azimuth')],
-    ['Usable Area', document.getElementById('f-roofarea').value ? document.getElementById('f-roofarea').value + ' sq ft' : '—'],
     ['Pitch', getRadio('pitch')],
+    ['Usable Area', getVal('f-roofarea') !== '—' ? getVal('f-roofarea') + ' sq ft' : '—'],
     ['Shading', getRadio('shade')],
-    ['Shading Notes', document.getElementById('f-shadenotes').value || '—'],
+    ['Shading Notes', getVal('f-shadenotes')],
+    ['Est. System Size', getVal('f-systemkw') !== '—' ? getVal('f-systemkw') + ' kW' : '—'],
     ['ELECTRICAL', null],
     ['Panel Amps', getRadio('amps')],
+    ['MPU Status', getRadio('mpu')],
     ['Panel Brand', getRadio('panelbrand')],
-    ['Open Slots', document.getElementById('f-slots').value || '—'],
-    ['Panel Upgrade', getRadio('panelupgrade')],
+    ['Open Slots', getVal('f-slots')],
     ['Meter', getRadio('meter')],
     ['Attic Access', getRadio('attic')],
     ['Wi-Fi', getRadio('wifi')],
     ['STORAGE & EV', null],
     ['Powerwall', getToggle('t-powerwall')],
     ['Enphase Battery', getToggle('t-enphase-batt')],
-    ['EV Charger', getToggle('t-ev')],
+    ...(battOn ? [['Battery Qty', getRadio('battqty')]] : []),
     ['Whole-Home Backup', getToggle('t-backup')],
+    ['EV Charger', getToggle('t-ev')],
+    ...(evOn ? [['EV Model', getVal('f-ev-model')], ['EVSE Location', getVal('f-ev-location')]] : []),
     ['Battery Location', getRadio('battloc')],
+    ['CUSTOMER', null],
+    ['Motivation', getRadio('motivation')],
+    ['Finance', getRadio('finance')],
+    ['Bill History', getRadio('billhist')],
+    ['Avg Monthly kWh', getVal('f-kwh') !== '—' ? getVal('f-kwh') + ' kWh' : '—'],
+    ['Timeline', getRadio('timeline')],
+    ['Decision Makers', getRadio('dm')],
     ['FLAGS', null],
     ['Active Flags', flags.length > 0 ? flags.join(' · ') : 'None'],
     ['NOTES', null],
-    ['Notes', document.getElementById('f-notes').value || '—'],
-    ['Photos Checked', getPhotoCount()],
+    ['Notes', getVal('f-notes')],
+    ['Checklist', `${[...document.querySelectorAll('.photo-check')].filter(b=>b.checked).length}/${TOTAL_PHOTOS} items`],
   ];
 
   const body = document.getElementById('modal-body');
@@ -848,12 +992,12 @@ async function submitToHubSpot() {
 
   const surveyText = buildNoteText();
   const driveUrl = document.getElementById('f-drive-url').value.trim();
+  const webodmUrl = document.getElementById('f-webodm-url').value.trim();
   const flags = getFlags();
 
   if (!foundDealId && !foundContactId) {
     showStatus('error', '⚠ No contact or deal linked. Use the search above to find the customer first.');
-    btn.disabled = false;
-    btn.textContent = 'Retry';
+    btn.disabled = false; btn.textContent = 'Retry';
     return;
   }
 
@@ -866,6 +1010,9 @@ async function submitToHubSpot() {
         contactId: foundContactId,
         surveyText,
         driveUrl,
+        webodmUrl,
+        pipeline: SOLAR_OPS_PIPELINE_ID,
+        dealstage: SOLAR_OPS_STAGE_SURVEY,
       })
     });
 
@@ -873,48 +1020,59 @@ async function submitToHubSpot() {
     if (!res.ok) throw new Error(data.error || 'Survey submission failed');
 
     showStatus('success',
-      `✓ Survey data pushed to HubSpot.<br><br>` +
-      `<strong>What was done:</strong><br>` +
-      `${foundDealId ? '• Deal stage advanced → Site Survey Complete<br>' : ''}` +
-      `• Full survey saved to Deal description<br>` +
+      `✓ Survey pushed to HubSpot — Solar Ops Clean.<br><br>` +
+      `<strong>What was updated:</strong><br>` +
+      `${foundDealId ? '• Deal moved → Site Survey stage<br>' : ''}` +
+      `• Full survey saved to deal description<br>` +
       `${driveUrl ? '• Drive folder URL saved<br>' : ''}` +
+      `${webodmUrl ? '• WebODM task URL saved<br>' : ''}` +
       `${flags.length > 0 ? `• ⚠ Flags: ${flags.join(', ')}<br>` : ''}` +
-      `<br>Next: build the proposal within 48 hours.`
+      `<br>Next: build proposal within 48 hours.`
     );
     btn.textContent = '✓ Done';
 
   } catch (err) {
     showStatus('error', `❌ ${err.message}`);
-    btn.disabled = false;
-    btn.textContent = 'Retry';
+    btn.disabled = false; btn.textContent = 'Retry';
   }
 }
+
 function buildNoteText() {
   const flags = getFlags();
   const photoDone = [...document.querySelectorAll('.photo-check')].filter(b => b.checked).length;
+  const evOn = document.getElementById('t-ev').checked;
+  const battOn = document.getElementById('t-powerwall').checked || document.getElementById('t-enphase-batt').checked;
+
   return [
     `SITE SURVEY — ${new Date().toLocaleString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'})}`,
+    `Pipeline: Solar Ops – Clean`,
     foundDealName ? `Deal: ${foundDealName}` : '',
-    document.getElementById('f-drive-url').value ? `Drive: ${document.getElementById('f-drive-url').value}` : '',
+    getVal('f-drive-url') !== '—' ? `Drive: ${getVal('f-drive-url')}` : '',
+    getVal('f-webodm-url') !== '—' ? `WebODM: ${getVal('f-webodm-url')}` : '',
     '',
-    `ADDRESS: ${document.getElementById('f-address').value || '—'}`,
-    `OWNER: ${getRadio('owner')} | HOA: ${getRadio('hoa')} | AHJ: ${getRadio('ahj')}`,
+    `ADDRESS: ${getVal('f-address')}`,
+    `OWNER: ${getRadio('owner')} | HOA: ${getRadio('hoa')} | AHJ: ${getRadio('ahj')} | UTILITY: ${getRadio('utility')}`,
     '',
     `ROOF: ${getRadio('roofmat')} | Age: ${getRadio('roofage')} | Condition: ${getRadio('roofcond')}`,
-    `Azimuth: ${getRadio('azimuth')} | Pitch: ${getRadio('pitch')} | Area: ${document.getElementById('f-roofarea').value || '—'} sq ft`,
-    `Shading: ${getRadio('shade')}${document.getElementById('f-shadenotes').value ? ' — ' + document.getElementById('f-shadenotes').value : ''}`,
+    `Azimuth: ${getRadio('azimuth')} | Pitch: ${getRadio('pitch')} | Area: ${getVal('f-roofarea') !== '—' ? getVal('f-roofarea') + ' sq ft' : '—'}`,
+    `Shading: ${getRadio('shade')}${getVal('f-shadenotes') !== '—' ? ' — ' + getVal('f-shadenotes') : ''}`,
+    getVal('f-systemkw') !== '—' ? `Est. System Size: ${getVal('f-systemkw')} kW` : '',
     '',
-    `ELECTRICAL: ${getRadio('amps')} | Brand: ${getRadio('panelbrand')} | Slots: ${document.getElementById('f-slots').value || '—'}`,
-    `Panel Upgrade: ${getRadio('panelupgrade')} | Meter: ${getRadio('meter')} | Attic: ${getRadio('attic')} | Wi-Fi: ${getRadio('wifi')}`,
+    `ELECTRICAL: ${getRadio('amps')} | MPU: ${getRadio('mpu')} | Brand: ${getRadio('panelbrand')} | Slots: ${getVal('f-slots')}`,
+    `Meter: ${getRadio('meter')} | Attic: ${getRadio('attic')} | Wi-Fi: ${getRadio('wifi')}`,
     '',
-    `STORAGE: Powerwall: ${getToggle('t-powerwall')} | Enphase: ${getToggle('t-enphase-batt')} | EV: ${getToggle('t-ev')} | Whole-home backup: ${getToggle('t-backup')}`,
+    `STORAGE: Powerwall: ${getToggle('t-powerwall')} | Enphase: ${getToggle('t-enphase-batt')}${battOn ? ' | Qty: ' + getRadio('battqty') : ''} | Whole-home backup: ${getToggle('t-backup')}`,
+    `EV Charger: ${getToggle('t-ev')}${evOn ? ' | Model: ' + getVal('f-ev-model') + ' | EVSE location: ' + getVal('f-ev-location') : ''}`,
     `Battery location: ${getRadio('battloc')}`,
+    '',
+    `CUSTOMER: Motivation: ${getRadio('motivation')} | Finance: ${getRadio('finance')} | Timeline: ${getRadio('timeline')}`,
+    `Bill history: ${getRadio('billhist')}${getVal('f-kwh') !== '—' ? ' | Avg monthly: ' + getVal('f-kwh') + ' kWh' : ''} | Decision makers: ${getRadio('dm')}`,
     '',
     flags.length > 0 ? `⚠ FLAGS: ${flags.join(' · ')}` : 'FLAGS: None',
     '',
-    `NOTES: ${document.getElementById('f-notes').value || 'None'}`,
-    `PHOTOS: ${photoDone}/8 checklist items captured`,
-  ].filter(l => l !== null).join('\n');
+    `NOTES: ${getVal('f-notes')}`,
+    `CHECKLIST: ${photoDone}/${TOTAL_PHOTOS} items`,
+  ].filter(l => l !== '').join('\n');
 }
 
 function showStatus(type, html) {
